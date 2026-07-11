@@ -2,8 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PdkOcrClient"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PdkOcrClient.MainWindow"
+        x:DataType="local:MainWindow"
         Title="PdkOcrClient">
     <Grid Margin="20" RowDefinitions="Auto, *, Auto" ColumnDefinitions="*, 300">
 
@@ -59,11 +61,40 @@
                     BorderBrush="#CCCCCC"
                     BorderThickness="1"
                     CornerRadius="6">
-                <!-- 선택 영역 데이터를 주렁주렁 렌더링할 리스트박스 마운트! -->
-                <ListBox Name="RoiAreaListBox" Background="Transparent">
-                    <ListBoxItem Content="선택 영역 01 - [Bounding Box A]"/>
-                    <ListBoxItem Content="선택 영역 02 - [Bounding Box B]"/>
-                    <ListBoxItem Content="선택 영역 03 - [Target Region C]"/>
+                <!-- 선택 영역과 OCR 텍스트를 함께 보여줄 리스트박스 -->
+                <ListBox Name="RoiAreaListBox"
+                         Background="Transparent"
+                         ItemsSource="{Binding RoiResults}">
+                    <ListBoxItem>
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="ROI1"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock Text="OCR 결과:쿠라몬"
+                                       Foreground="#2b579a"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    <ListBoxItem>
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="ROI2"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock Text="OCR 결과:유년기I"
+                                       Foreground="#2b579a"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    <ListBoxItem>
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="ROI3"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock Text="OCR 결과:NO DATA"
+                                       Foreground="#2b579a"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </ListBoxItem>
                 </ListBox>
             </Border>
         </Grid>
