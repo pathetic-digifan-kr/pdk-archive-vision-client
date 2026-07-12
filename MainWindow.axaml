@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:PdkOcrClient"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PdkOcrClient.MainWindow"
-        x:DataType="local:MainWindow"
+        x:DataType="local:MainWindowViewModel"
         Title="PdkOcrClient">
     <Grid Margin="20" RowDefinitions="Auto, *, Auto" ColumnDefinitions="*, 300">
 
@@ -17,13 +17,12 @@
                     Background="#2b579a"
                     Foreground="White"
                     FontWeight="Bold"
-                    Click="OnSelectImageFileClick"/>
+                    Command="{Binding OpenFileDialogCommand}"/>
 
-            <TextBlock Text="선택된 파일: 없음"
-                       VerticalAlignment="Center"
-                       Foreground="#666666"
-                       FontWeight="SemiBold"
-                       Name="TxtFilePath"/>
+            <TextBlock Foreground="#666666" FontWeight="SemiBold" VerticalAlignment="Center">
+                <Run Text="선택된 파일:"/>
+                <Run Text="{Binding SelectedFileName}"/>
+            </TextBlock>
         </StackPanel>
 
         <!-- ─── LEFT MAIN ZONE: 이미지 뷰포트 영역 ─── -->
@@ -38,10 +37,12 @@
                 <Image Name="MainVisualViewer"
                        Stretch="Uniform"
                        Margin="10"
+                       Source="{Binding MainImage}"
                        />
 
                 <!-- 이미지가 없을 때 띄워줄 청정 가이드 레이블 -->
-                <TextBlock Text="오른쪽 버튼을 눌러 이미지를 로드해 주세요"
+                <TextBlock Text="버튼을 눌러 이미지를 로드해 주세요"
+                           IsVisible="{Binding MainImage, Converter={x:Static ObjectConverters.IsNull}}"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
                            Foreground="#999999"/>

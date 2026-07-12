@@ -15,7 +15,13 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
+            var dialogService = new WindowDialogService();
+            var MainWindowViewModel = new MainWindowViewModel(dialogService);
+            
+            desktop.MainWindow = new MainWindow
+            {
+                DataContext = MainWindowViewModel
+            };
         }
 
         base.OnFrameworkInitializationCompleted();
