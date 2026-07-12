@@ -33,12 +33,30 @@
                 BorderThickness="1"
                 Margin="0,0,15,0">
             <Grid>
-                <!-- 파이썬 서버로 보낼 오리지널 이미지 및 크롭 뷰어 -->
-                <Image Name="MainVisualViewer"
-                       Stretch="Uniform"
-                       Margin="10"
-                       Source="{Binding MainImage}"
-                       />
+                <Viewbox Stretch="Uniform"
+                         Margin="10"
+                         HorizontalAlignment="Stretch"
+                         VerticalAlignment="Stretch">
+                    <Grid>
+                        <Image Name="MainVisualViewer"
+                               Stretch="None"
+                               Source="{Binding MainImage}"/>
+
+                        <Canvas Name="RoiCanvas"
+                                Background="Transparent"
+                                PointerPressed="RoiCanvas_PointerPressed"
+                                PointerMoved="RoiCanvas_PointerMoved"
+                                PointerReleased="RoiCanvas_PointerReleased">
+                            <Rectangle Name="RoiRectangle"
+                                       Stroke="Red"
+                                       Opacity="0.2"
+                                       Fill="Red"
+                                       StrokeThickness="2"
+                                       Width="0"
+                                       Height="0"/>
+                        </Canvas>
+                    </Grid>
+                </Viewbox>
 
                 <!-- 이미지가 없을 때 띄워줄 청정 가이드 레이블 -->
                 <TextBlock Text="버튼을 눌러 이미지를 로드해 주세요"
