@@ -16,7 +16,8 @@
                     Padding="15,8"
                     Background="#2b579a"
                     Foreground="White"
-                    FontWeight="Bold"/>
+                    FontWeight="Bold"
+                    Click="OnSelectImageFileClick"/>
 
             <TextBlock Text="선택된 파일: 없음"
                        VerticalAlignment="Center"
@@ -49,12 +50,21 @@
 
         <!-- ─── RIGHT SIDEBAR ZONE: 선택 영역 목록 (ROI List) ─── -->
         <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="Auto, *">
-            <TextBlock Grid.Row="0"
-                       Text="🎯 탐색 선택 영역 목록"
-                       FontWeight="Bold"
-                       FontSize="14"
-                       Margin="0,0,0,10"
-                       Foreground="#333333"/>
+            <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,0,0,10">
+                <TextBlock Grid.Column="0"
+                           Text="🎯 탐색 선택 영역 목록"
+                           FontWeight="Bold"
+                           FontSize="14"
+                           Foreground="#333333"
+                           VerticalAlignment="Center"/>
+
+                <Button Grid.Column="1"
+                        Content="➕ ROI 추가"
+                        Padding="10,6"
+                        Background="#2b579a"
+                        Foreground="White"
+                        FontWeight="SemiBold"/>
+            </Grid>
 
             <Border Grid.Row="1"
                     Background="White"
@@ -63,8 +73,7 @@
                     CornerRadius="6">
                 <!-- 선택 영역과 OCR 텍스트를 함께 보여줄 리스트박스 -->
                 <ListBox Name="RoiAreaListBox"
-                         Background="Transparent"
-                         ItemsSource="{Binding RoiResults}">
+                         Background="Transparent">
                     <ListBoxItem>
                         <StackPanel Spacing="4">
                             <TextBlock Text="ROI1"
@@ -101,11 +110,24 @@
 
         <!-- ─── BOTTOM STATUS ZONE: 파이썬 서버 비동기 통신 격발 라인 ─── -->
         <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                    Margin="0,20,0,0" HorizontalAlignment="Right">
+                    Margin="0,20,0,0" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="10">
+            <Button Content="🖼️ 템플릿 저장"
+                    Padding="16,10"
+                    Background="#2b579a"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    />
+            <Button Content="📝 OCR 결과 저장"
+                    Padding="16,10"
+                    Background="#107c41"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    />
             <Button Content="⚡ OCR 분석 시작"
                     Padding="20,10"
                     Background="#107c41"
                     Foreground="White"
-                    FontWeight="Bold"/>
+                    FontWeight="Bold"
+                    />
         </StackPanel>
     </Grid></Window>
