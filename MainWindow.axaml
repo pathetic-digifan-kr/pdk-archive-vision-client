@@ -3,6 +3,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PdkOcrClient"
+        xmlns:behaviors="clr-namespace:PdkOcrClient.Behaviors"
+        xmlns:i="using:Avalonia.Xaml.Interactivity"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PdkOcrClient.MainWindow"
         x:DataType="local:MainWindowViewModel"
@@ -36,7 +38,10 @@
                 <Viewbox Stretch="Uniform"
                          Margin="10"
                          HorizontalAlignment="Stretch"
-                         VerticalAlignment="Stretch">
+                         VerticalAlignment="Stretch"
+                         Width="{Binding CurrentRoiCanvasWidth, Mode=OneWayToSource}"
+                         Height="{Binding CurrentRoiCanvasHeight, Mode=OneWayToSource}"
+                         >
                     <Grid>
                         <Image Name="MainVisualViewer"
                                Stretch="None"
@@ -46,14 +51,22 @@
                                 Background="Transparent"
                                 PointerPressed="RoiCanvas_PointerPressed"
                                 PointerMoved="RoiCanvas_PointerMoved"
-                                PointerReleased="RoiCanvas_PointerReleased">
+                                PointerReleased="RoiCanvas_PointerReleased"
+                                >
+                            <i:Interaction.Behaviors>
+                                <behaviors:CanvasDrawingBehavior RegionRegisteredCommand="{Binding RegisterNewRegionCommand}"/>
+                            </i:Interaction.Behaviors>
+
                             <Rectangle Name="RoiRectangle"
                                        Stroke="Red"
                                        Opacity="0.2"
                                        Fill="Red"
                                        StrokeThickness="2"
-                                       Width="0"
-                                       Height="0"/>
+                                       Canvas.Left="{Binding CurrentRoiX, Mode=TwoWay}"
+                                       Canvas.Top="{Binding CurrentRoiY, Mode=TwoWay}"
+                                       Width="{Binding CurrentRoiWidth, Mode=TwoWay}"
+                                       Height="{Binding CurrentRoiHeight, Mode=TwoWay}"
+                                       IsVisible="{Binding CurrentRoiIsVisible}"/>
                         </Canvas>
                     </Grid>
                 </Viewbox>
@@ -82,7 +95,8 @@
                         Padding="10,6"
                         Background="#2b579a"
                         Foreground="White"
-                        FontWeight="SemiBold"/>
+                        FontWeight="SemiBold"
+                        Command="{Binding AddRoiCommand}"/>
             </Grid>
 
             <Border Grid.Row="1"
