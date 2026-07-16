@@ -53,10 +53,6 @@
                                 PointerMoved="RoiCanvas_PointerMoved"
                                 PointerReleased="RoiCanvas_PointerReleased"
                                 >
-                            <i:Interaction.Behaviors>
-                                <behaviors:CanvasDrawingBehavior RegionRegisteredCommand="{Binding RegisterNewRegionCommand}"/>
-                            </i:Interaction.Behaviors>
-
                             <Rectangle Name="RoiRectangle"
                                        Stroke="Red"
                                        Opacity="0.2"

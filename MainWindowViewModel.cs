@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using PdkOcrClient.EventArgs;
 
 namespace PdkOcrClient;
 public partial class MainWindowViewModel : ObservableObject
@@ -69,22 +68,20 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    private void RegisterNewRegion(DrawingRectArgs args)
+    public void UpdateCurrentRoiState(double x, double y, double width, double height, bool isVisible)
     {
-        Debug.WriteLine($"Registering new region: X={args.X}, Y={args.Y}, Width={args.Width}, Height={args.Height}, CanvasWidth={args.CanvasActualWidth}, CanvasHeight={args.CanvasActualHeight}");
-        //UpdateCurrentRoiState(args.X, args.Y, args.Width, args.Height, true, args.CanvasWidth, args.CanvasHeight);
-    }
+        if(MainImage is null)
+        {
+            return;
+        }
 
-    public void UpdateCurrentRoiState(double x, double y, double width, double height, bool isVisible, double canvasWidth, double canvasHeight)
-    {
         CurrentRoiX = x;
         CurrentRoiY = y;
         CurrentRoiWidth = width;
         CurrentRoiHeight = height;
         CurrentRoiIsVisible = isVisible;
-        CurrentRoiCanvasWidth = canvasWidth > 0 ? canvasWidth : 1;
-        CurrentRoiCanvasHeight = canvasHeight > 0 ? canvasHeight : 1;
+        CurrentRoiCanvasWidth = MainImage.PixelSize.Width;
+        CurrentRoiCanvasHeight = MainImage.PixelSize.Height;
     }
 
     [RelayCommand]
@@ -100,13 +97,10 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        var canvasWidth = Math.Max(1d, CurrentRoiCanvasWidth);
-        var canvasHeight = Math.Max(1d, CurrentRoiCanvasHeight);
-
-        var xRatio = Math.Clamp(CurrentRoiX / canvasWidth, 0d, 1d);
-        var yRatio = Math.Clamp(CurrentRoiY / canvasHeight, 0d, 1d);
-        var widthRatio = Math.Clamp(CurrentRoiWidth / canvasWidth, 0d, 1d);
-        var heightRatio = Math.Clamp(CurrentRoiHeight / canvasHeight, 0d, 1d);
+        var xRatio = Math.Clamp(CurrentRoiX / MainImage.PixelSize.Width, 0d, 1d);
+        var yRatio = Math.Clamp(CurrentRoiY / MainImage.PixelSize.Height, 0d, 1d);
+        var widthRatio = Math.Clamp(CurrentRoiWidth / MainImage.PixelSize.Width, 0d, 1d);
+        var heightRatio = Math.Clamp(CurrentRoiHeight / MainImage.PixelSize.Height, 0d, 1d);
 
         InspectionRegions.Add(new InspectionRegion
         {
@@ -121,7 +115,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         Debug.WriteLine($"Added ROI: X={xRatio}, Y={yRatio}, Width={widthRatio}, Height={heightRatio}");
 
-        UpdateCurrentRoiState(0, 0, 0, 0, false, canvasWidth, canvasHeight);
+        UpdateCurrentRoiState(0, 0, 0, 0, false);
     }
 
 }
