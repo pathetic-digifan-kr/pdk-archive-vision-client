@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:PdkOcrClient.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="180"
+        x:Class="PdkOcrClient.Dialog.AddRoiDialog"
+        x:DataType="vm:AddRoiDialogViewModel"
+        Title="ROI 추가"
+        Width="360"
+        Height="180">
+        <StackPanel Margin="20" Spacing="12">
+                <TextBlock Text="ROI 명칭" FontWeight="SemiBold" />
+                <TextBox Name="RoiNameTextBox"
+                         Text="{Binding RoiName, Mode=TwoWay}"
+                         Watermark="ROI 이름을 입력하세요" />
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="10">
+                        <Button Content="확인"
+                                IsDefault="True"
+                                Command="{Binding ConfirmCommand}" />
+                        <Button Content="취소"
+                                IsCancel="True"
+                                Command="{Binding CancelCommand}" />
+                </StackPanel>
+        </StackPanel>
+</Window>

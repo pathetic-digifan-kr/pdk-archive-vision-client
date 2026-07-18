@@ -85,7 +85,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void AddRoi()
+    private async Task AddRoi()
     {
         if (MainImage is null)
         {
@@ -96,6 +96,16 @@ public partial class MainWindowViewModel : ObservableObject
         {
             return;
         }
+
+        var roiName = await _dialogService.OpenAddRoiDialogAsync();
+
+        if(roiName is null)
+        {
+            Debug.WriteLine("ROI 추가 취소됨");
+            return;
+        }
+
+        Debug.WriteLine($"ROI 이름: {roiName ?? "취소됨"}");
 
         var xRatio = Math.Clamp(CurrentRoiX / MainImage.PixelSize.Width, 0d, 1d);
         var yRatio = Math.Clamp(CurrentRoiY / MainImage.PixelSize.Height, 0d, 1d);
