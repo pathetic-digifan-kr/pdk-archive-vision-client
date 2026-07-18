@@ -22,7 +22,7 @@ public class WindowDialogService : IDialogService
             {
                 Title = title,
                 AllowMultiple = false,
-                FileTypeFilter = new[] { FilePickerFileTypes.ImageAll } // 이미지 확장자 가드 오토 필터링!
+                FileTypeFilter = [FilePickerFileTypes.ImageAll] // 이미지 확장자 가드 오토 필터링!
             });
 
             // 4. 선택된 파일 패킷이 존재하면 로컬 절대 경로 파싱해서 리턴!
