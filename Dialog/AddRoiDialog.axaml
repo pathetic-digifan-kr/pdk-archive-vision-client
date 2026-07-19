@@ -3,27 +3,51 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:PdkOcrClient.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="180"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="200"
         x:Class="PdkOcrClient.Dialog.AddRoiDialog"
         x:DataType="vm:AddRoiDialogViewModel"
         Title="ROI 추가"
-        Width="360"
-        Height="180">
-        <StackPanel Margin="20" Spacing="12">
-                <TextBlock Text="ROI 명칭" FontWeight="SemiBold" />
-                <TextBox Name="RoiNameTextBox"
-                         Text="{Binding RoiName, Mode=TwoWay}"
-                         Watermark="ROI 이름을 입력하세요" />
+        Width="380"
+        Height="200"
+        Background="#F7F7F7">
+        <Border Margin="16"
+                Background="White"
+                BorderBrush="#CCCCCC"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="20">
+                <StackPanel Spacing="14">
+                        <TextBlock Text="ROI 명칭"
+                                   FontWeight="SemiBold"
+                                   FontSize="14"
+                                   Foreground="#333333" />
+                        <TextBox Name="RoiNameTextBox"
+                                 Text="{Binding RoiName, Mode=TwoWay}"
+                                 Watermark="ROI 이름을 입력하세요"
+                                 Padding="10,8"
+                                 BorderBrush="#CCCCCC" />
 
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            Spacing="10">
-                        <Button Content="확인"
-                                IsDefault="True"
-                                Command="{Binding ConfirmCommand}" />
-                        <Button Content="취소"
-                                IsCancel="True"
-                                Command="{Binding CancelCommand}" />
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Spacing="10"
+                                    Margin="0,4,0,0">
+                                <Button Content="확인"
+                                        IsDefault="True"
+                                        Command="{Binding ConfirmCommand}"
+                                        Padding="14,8"
+                                        Background="#2b579a"
+                                        Foreground="White"
+                                        FontWeight="SemiBold" />
+                                <Button Content="취소"
+                                        IsCancel="True"
+                                        Command="{Binding CancelCommand}"
+                                        Padding="14,8"
+                                        Background="#F0F0F0"
+                                        Foreground="#333333"
+                                        BorderBrush="#CCCCCC"
+                                        BorderThickness="1"
+                                        FontWeight="SemiBold" />
+                        </StackPanel>
                 </StackPanel>
-        </StackPanel>
+        </Border>
 </Window>
