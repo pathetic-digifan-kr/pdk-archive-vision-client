@@ -112,19 +112,23 @@ public partial class MainWindowViewModel : ObservableObject
         var widthRatio = Math.Clamp(CurrentRoiWidth / MainImage.PixelSize.Width, 0d, 1d);
         var heightRatio = Math.Clamp(CurrentRoiHeight / MainImage.PixelSize.Height, 0d, 1d);
 
+        /// ROI 추가
         InspectionRegions.Add(new InspectionRegion
         {
-            RegionName = $"ROI {InspectionRegions.Count + 1}",
+            RegionName = $"{roiName}",
             XRatio = xRatio,
             YRatio = yRatio,
             WidthRatio = widthRatio,
             HeightRatio = heightRatio,
-            SourceImageWidth = MainImage.PixelSize.Width,
-            SourceImageHeight = MainImage.PixelSize.Height,
+            X = CurrentRoiX,
+            Y = CurrentRoiY,
+            Width = CurrentRoiWidth,
+            Height = CurrentRoiHeight
         });
 
         Debug.WriteLine($"Added ROI: X={xRatio}, Y={yRatio}, Width={widthRatio}, Height={heightRatio}");
 
+        /// 그린 ROI 제거
         UpdateCurrentRoiState(0, 0, 0, 0, false);
     }
 

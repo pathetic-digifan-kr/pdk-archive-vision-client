@@ -3,8 +3,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PdkOcrClient"
-        xmlns:behaviors="clr-namespace:PdkOcrClient.Behaviors"
-        xmlns:i="using:Avalonia.Xaml.Interactivity"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PdkOcrClient.MainWindow"
         x:DataType="local:MainWindowViewModel"
@@ -102,37 +100,20 @@
                     CornerRadius="6">
                 <!-- 선택 영역과 OCR 텍스트를 함께 보여줄 리스트박스 -->
                 <ListBox Name="RoiAreaListBox"
-                         Background="Transparent">
-                    <ListBoxItem>
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="ROI1"
-                                       FontWeight="SemiBold"
-                                       TextWrapping="Wrap"/>
-                            <TextBlock Text="OCR 결과:쿠라몬"
-                                       Foreground="#2b579a"
-                                       TextWrapping="Wrap"/>
-                        </StackPanel>
-                    </ListBoxItem>
-                    <ListBoxItem>
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="ROI2"
-                                       FontWeight="SemiBold"
-                                       TextWrapping="Wrap"/>
-                            <TextBlock Text="OCR 결과:유년기I"
-                                       Foreground="#2b579a"
-                                       TextWrapping="Wrap"/>
-                        </StackPanel>
-                    </ListBoxItem>
-                    <ListBoxItem>
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="ROI3"
-                                       FontWeight="SemiBold"
-                                       TextWrapping="Wrap"/>
-                            <TextBlock Text="OCR 결과:NO DATA"
-                                       Foreground="#2b579a"
-                                       TextWrapping="Wrap"/>
-                        </StackPanel>
-                    </ListBoxItem>
+                         Background="Transparent" ItemsSource="{Binding InspectionRegions}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{Binding RegionName}"
+                                           FontWeight="SemiBold"
+                                           TextWrapping="Wrap"/>
+                                <TextBlock Foreground="#2b579a" TextWrapping="Wrap">
+                                    <Run Text="OCR 결과:"/>
+                                    <Run Text="{Binding OcrResult}"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
                 </ListBox>
             </Border>
         </Grid>
