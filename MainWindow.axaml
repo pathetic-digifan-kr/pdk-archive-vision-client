@@ -45,6 +45,32 @@
                                Stretch="None"
                                Source="{Binding MainImage}"/>
 
+                        <ItemsControl ItemsSource="{Binding InspectionRegions}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.Styles>
+                                <Style Selector="ItemsControl > ContentPresenter" x:DataType="local:InspectionRegion">
+                                    <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                                </Style>
+                            </ItemsControl.Styles>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Rectangle Stroke="#2b579a"
+                                               Fill="#2b579a"
+                                               Opacity="0.18"
+                                               StrokeThickness="2"
+                                               Width="{Binding Width}"
+                                               Height="{Binding Height}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
                         <Canvas Name="RoiCanvas"
                                 Background="Transparent"
                                 PointerPressed="RoiCanvas_PointerPressed"
@@ -62,6 +88,7 @@
                                        Height="{Binding CurrentRoiHeight, Mode=TwoWay}"
                                        IsVisible="{Binding CurrentRoiIsVisible}"/>
                         </Canvas>
+
                     </Grid>
                 </Viewbox>
 

@@ -126,7 +126,7 @@ public partial class MainWindowViewModel : ObservableObject
             Height = CurrentRoiHeight
         });
 
-        Debug.WriteLine($"Added ROI: X={xRatio}, Y={yRatio}, Width={widthRatio}, Height={heightRatio}");
+        Debug.WriteLine($"Added ROI: X={CurrentRoiX}, Y={CurrentRoiY}, Width={CurrentRoiWidth}, Height={CurrentRoiHeight}");
 
         /// 그린 ROI 제거
         UpdateCurrentRoiState(0, 0, 0, 0, false);
