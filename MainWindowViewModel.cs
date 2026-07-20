@@ -2,10 +2,15 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PdkOcrClient.Services;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace PdkOcrClient;
 public partial class MainWindowViewModel : ObservableObject
@@ -41,10 +46,12 @@ public partial class MainWindowViewModel : ObservableObject
     private double _currentRoiCanvasHeight = 1;
 
     private readonly IDialogService _dialogService;
+    private readonly OcrClient _ocrClient;
 
-    public MainWindowViewModel(IDialogService dialogService)
+    public MainWindowViewModel(IDialogService dialogService, OcrClient? ocrClient = null)
     {
         _dialogService = dialogService;
+        _ocrClient = ocrClient ?? new OcrClient();
     }
 
     [RelayCommand]
@@ -130,6 +137,56 @@ public partial class MainWindowViewModel : ObservableObject
 
         /// 그린 ROI 제거
         UpdateCurrentRoiState(0, 0, 0, 0, false);
+    }
+
+    [RelayCommand]
+    private async Task DoOcr()
+    {
+        if (MainImage is null)
+        {
+            Debug.WriteLine("OCR 실행 실패: 이미지가 로드되지 않았습니다.");
+            return;
+        }
+
+        if (InspectionRegions.Count == 0)
+        {
+            Debug.WriteLine("OCR 실행 실패: ROI가 없습니다.");
+            return;
+        }
+
+        try
+        {
+            using var webpStream = await ConvertBitmapToWebpAsync(MainImage);
+            var roiModels = InspectionRegions.Select(region => new RoiModel
+            {
+                Label = region.RegionName,
+                X = region.XRatio,
+                Y = region.YRatio,
+                Width = region.WidthRatio,
+                Height = region.HeightRatio
+            }).ToList();
+
+            var response = await _ocrClient.SendOcrRequestAsync(webpStream, roiModels);
+            Debug.WriteLine($"OCR 응답: {response}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"OCR 실행 실패: {ex.Message}");
+        }
+    }
+
+    private static Task<MemoryStream> ConvertBitmapToWebpAsync(Bitmap bitmap)
+    {
+        var pngStream = new MemoryStream();
+        bitmap.Save(pngStream);
+        pngStream.Position = 0;
+
+        using var image = Image.Load<Rgba32>(pngStream);
+        var webpStream = new MemoryStream();
+        image.Save(webpStream, new WebpEncoder { Quality = 90 });
+        webpStream.Position = 0;
+
+        return Task.FromResult(webpStream);
     }
 
 }

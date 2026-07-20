@@ -165,6 +165,7 @@
                     Background="#107c41"
                     Foreground="White"
                     FontWeight="Bold"
+                    Command="{Binding DoOcrCommand}"
                     />
         </StackPanel>
     </Grid></Window>

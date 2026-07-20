@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using PdkOcrClient.Services;
 
 namespace PdkOcrClient;
 
@@ -16,7 +17,8 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var dialogService = new WindowDialogService();
-            var MainWindowViewModel = new MainWindowViewModel(dialogService);
+            var ocrClient = new OcrClient();
+            var MainWindowViewModel = new MainWindowViewModel(dialogService, ocrClient);
             
             desktop.MainWindow = new MainWindow
             {
