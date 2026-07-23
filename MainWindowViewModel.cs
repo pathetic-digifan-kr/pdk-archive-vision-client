@@ -159,7 +159,7 @@ public partial class MainWindowViewModel : ObservableObject
             using var webpStream = await ConvertBitmapToWebpAsync(MainImage);
             var roiModels = InspectionRegions.Select(region => new RoiModel
             {
-                Label = region.RegionName,
+                Label = region.RegionId,
                 X = region.XRatio,
                 Y = region.YRatio,
                 Width = region.WidthRatio,
@@ -167,6 +167,12 @@ public partial class MainWindowViewModel : ObservableObject
             }).ToList();
 
             var response = await _ocrClient.SendOcrRequestAsync(webpStream, roiModels);
+
+            foreach(var inspectionRegion in InspectionRegions)
+            {
+                inspectionRegion.OcrResult = response?.parsed_data?.Where(x => x.Id == inspectionRegion.RegionId)?.First()?.Text ?? "OCR 누락";
+            }
+
             Debug.WriteLine($"OCR 응답: {response}");
         }
         catch (Exception ex)

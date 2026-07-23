@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using PdkOcrClient.Models;
 
 namespace PdkOcrClient.Services;
 
@@ -27,7 +29,7 @@ public class OcrClient
         };
     }
 
-    public async Task<string> SendOcrRequestAsync(
+    public async Task<RoiResponse?> SendOcrRequestAsync(
         Stream imageStream,
         IReadOnlyList<RoiModel> regions,
         CancellationToken cancellationToken = default)
@@ -60,7 +62,7 @@ public class OcrClient
         content.Add(regionsContent, "zones_json");
 
         using var response = await _httpClient.PostAsync($"{_baseUrl}/vision/ocr-pipeline", content, cancellationToken);
-        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+        var responseBody = await response.Content.ReadFromJsonAsync<RoiResponse>(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -70,7 +72,7 @@ public class OcrClient
         return responseBody;
     }
 
-    public async Task<string> SendOcrRequestAsync(
+    public async Task<RoiResponse?> SendOcrRequestAsync(
         string imagePath,
         IReadOnlyList<RoiModel> regions,
         CancellationToken cancellationToken = default)
