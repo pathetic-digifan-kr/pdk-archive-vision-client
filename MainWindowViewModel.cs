@@ -47,11 +47,16 @@ public partial class MainWindowViewModel : ObservableObject
 
     private readonly IDialogService _dialogService;
     private readonly OcrClient _ocrClient;
+    private readonly RoiTemplateStorageService _roiTemplateStorageService;
 
-    public MainWindowViewModel(IDialogService dialogService, OcrClient? ocrClient = null)
+    public MainWindowViewModel(
+        IDialogService dialogService,
+        OcrClient? ocrClient = null,
+        RoiTemplateStorageService? roiTemplateStorageService = null)
     {
         _dialogService = dialogService;
         _ocrClient = ocrClient ?? new OcrClient();
+        _roiTemplateStorageService = roiTemplateStorageService ?? new RoiTemplateStorageService();
     }
 
     [RelayCommand]
@@ -137,6 +142,40 @@ public partial class MainWindowViewModel : ObservableObject
 
         /// 그린 ROI 제거
         UpdateCurrentRoiState(0, 0, 0, 0, false);
+    }
+
+    [RelayCommand]
+    private async Task SaveRoiTemplate()
+    {
+        if (InspectionRegions.Count == 0)
+        {
+            Debug.WriteLine("ROI template save canceled: no ROI regions.");
+            return;
+        }
+
+        var templateName = await _dialogService.OpenRoiTemplateNameDialogAsync();
+        if (templateName is null)
+        {
+            Debug.WriteLine("ROI template save canceled.");
+            return;
+        }
+
+        var template = new RoiTemplate
+        {
+            Name = templateName,
+            TargetImageFileName = SelectedFileName,
+            Regions = InspectionRegions.Select(region => new RoiModel
+            {
+                Label = region.RegionName,
+                X = region.XRatio,
+                Y = region.YRatio,
+                Width = region.WidthRatio,
+                Height = region.HeightRatio
+            }).ToList()
+        };
+
+        await _roiTemplateStorageService.SaveTemplateAsync(template);
+        Debug.WriteLine($"Saved ROI template: {templateName}");
     }
 
     [RelayCommand]

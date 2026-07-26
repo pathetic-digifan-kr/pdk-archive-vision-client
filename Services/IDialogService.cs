@@ -7,4 +7,6 @@ public interface IDialogService
 
     // ROI 추가 대화창을 열고 입력된 ROI 이름을 반환
     Task<string?> OpenAddRoiDialogAsync();
+
+    Task<string?> OpenRoiTemplateNameDialogAsync();
 }

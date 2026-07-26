@@ -153,6 +153,7 @@
                     Background="#2b579a"
                     Foreground="White"
                     FontWeight="Bold"
+                    Command="{Binding SaveRoiTemplateCommand}"
                     />
             <Button Content="📝 OCR 결과 저장"
                     Padding="16,10"

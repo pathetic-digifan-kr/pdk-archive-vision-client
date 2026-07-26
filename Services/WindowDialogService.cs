@@ -54,4 +54,27 @@ public class WindowDialogService : IDialogService
 
         return null;
     }
+
+    public async Task<string?> OpenRoiTemplateNameDialogAsync()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+            && desktop.MainWindow is Window mainWindow)
+        {
+            var dialog = new PdkOcrClient.Dialog.RoiTemplateNameDialog
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+
+            var viewModel = new RoiTemplateNameDialogViewModel(result =>
+            {
+                dialog.Close(result);
+            });
+
+            dialog.DataContext = viewModel;
+
+            return await dialog.ShowDialog<string?>(mainWindow);
+        }
+
+        return null;
+    }
 }
