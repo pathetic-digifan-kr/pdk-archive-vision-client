@@ -8,9 +8,7 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PdkOcrClient.Services;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Webp;
-using SixLabors.ImageSharp.PixelFormats;
+using SkiaSharp;
 
 namespace PdkOcrClient;
 public partial class MainWindowViewModel : ObservableObject
@@ -111,8 +109,6 @@ public partial class MainWindowViewModel : ObservableObject
 
         string roiName = $"ROI {InspectionRegions.Count + 1}";
 
-
-        Debug.WriteLine($"ROI 이름: {roiName ?? "취소됨"}");
 
         var xRatio = Math.Clamp(CurrentRoiX / MainImage.PixelSize.Width, 0d, 1d);
         var yRatio = Math.Clamp(CurrentRoiY / MainImage.PixelSize.Height, 0d, 1d);
@@ -221,10 +217,9 @@ public partial class MainWindowViewModel : ObservableObject
         bitmap.Save(pngStream);
         pngStream.Position = 0;
 
-        using var image = Image.Load<Rgba32>(pngStream);
+        using var sKBitmap = SKBitmap.Decode(pngStream);
         var webpStream = new MemoryStream();
-        image.Save(webpStream, new WebpEncoder { Quality = 90 });
-        webpStream.Position = 0;
+        sKBitmap.Encode(webpStream, SKEncodedImageFormat.Webp, 100);
 
         return Task.FromResult(webpStream);
     }
