@@ -109,13 +109,8 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        var roiName = await _dialogService.OpenAddRoiDialogAsync();
+        string roiName = $"ROI {InspectionRegions.Count + 1}";
 
-        if(roiName is null)
-        {
-            Debug.WriteLine("ROI 추가 취소됨");
-            return;
-        }
 
         Debug.WriteLine($"ROI 이름: {roiName ?? "취소됨"}");
 

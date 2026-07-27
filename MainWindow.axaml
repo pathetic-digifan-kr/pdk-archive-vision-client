@@ -7,6 +7,9 @@
         x:Class="PdkOcrClient.MainWindow"
         x:DataType="local:MainWindowViewModel"
         Title="PdkOcrClient">
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Space" Command="{Binding AddRoiCommand}"/>
+    </Window.KeyBindings>
     <Grid Margin="20" RowDefinitions="Auto, *, Auto" ColumnDefinitions="*, 300">
 
         <!-- ─── TOP HEADER ZONE: 컨트롤 및 파일 선택 라인 ─── -->

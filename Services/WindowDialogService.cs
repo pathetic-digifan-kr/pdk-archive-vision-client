@@ -7,6 +7,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
 using PdkOcrClient.ViewModels;
 
+namespace PdkOcrClient.Services;
+
 public class WindowDialogService : IDialogService
 {
     public async Task<string?> OpenFileDialogAsync(string title)
@@ -29,29 +31,6 @@ public class WindowDialogService : IDialogService
                 return files[0].Path.LocalPath;
             }
         }
-        return null;
-    }
-
-    public async Task<string?> OpenAddRoiDialogAsync()
-    {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
-            && desktop.MainWindow is Window mainWindow)
-        {
-            var dialog = new PdkOcrClient.Dialog.AddRoiDialog
-            {
-                WindowStartupLocation = WindowStartupLocation.CenterOwner
-            };
-
-            var viewModel = new AddRoiDialogViewModel(result =>
-            {
-                dialog.Close(result);
-            });
-
-            dialog.DataContext = viewModel;
-
-            return await dialog.ShowDialog<string?>(mainWindow);
-        }
-
         return null;
     }
 
