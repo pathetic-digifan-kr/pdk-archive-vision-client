@@ -46,6 +46,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly IDialogService _dialogService;
     private readonly OcrClient _ocrClient;
     private readonly RoiTemplateStorageService _roiTemplateStorageService;
+    private string? _selectedFilePath;
 
     public MainWindowViewModel(
         IDialogService dialogService,
@@ -70,6 +71,7 @@ public partial class MainWindowViewModel : ObservableObject
 
                 MainImage = new Bitmap(stream);
                 SelectedFileName = Path.GetFileName(filePath);
+                _selectedFilePath = filePath;
             }
             catch (Exception ex)
             {
@@ -154,7 +156,6 @@ public partial class MainWindowViewModel : ObservableObject
         var template = new RoiTemplate
         {
             Name = templateName,
-            TargetImageFileName = SelectedFileName,
             Regions = InspectionRegions.Select(region => new RoiModel
             {
                 Label = region.RegionName,
@@ -165,7 +166,7 @@ public partial class MainWindowViewModel : ObservableObject
             }).ToList()
         };
 
-        await _roiTemplateStorageService.SaveTemplateAsync(template);
+        await _roiTemplateStorageService.SaveTemplateAsync(template, _selectedFilePath);
         Debug.WriteLine($"Saved ROI template: {templateName}");
     }
 

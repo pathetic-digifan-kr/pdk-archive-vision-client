@@ -45,9 +45,19 @@ namespace PdkOcrClient.Services
         // JSON 저장
         public async Task SaveTemplateAsync(RoiTemplate template)
         {
-            string filePath = Path.Combine(_templateFolderPath, $"{template.Name}.json");
+            string filePath = Path.Combine(_templateFolderPath, $"{GetSafeFileName(template.Name)}.json");
             using var stream = File.Create(filePath);
             await JsonSerializer.SerializeAsync(stream, template, _jsonOptions);
+        }
+
+        public async Task SaveTemplateAsync(RoiTemplate template, string? sourceImagePath)
+        {
+            if (!string.IsNullOrWhiteSpace(sourceImagePath) && File.Exists(sourceImagePath))
+            {
+                template.TargetImageFileName = await CopyTemplateImageAsync(template.Name, sourceImagePath);
+            }
+
+            await SaveTemplateAsync(template);
         }
 
         // 전체 JSON 불러오기
@@ -64,6 +74,32 @@ namespace PdkOcrClient.Services
             }
 
             return templates;
+        }
+
+        private async Task<string> CopyTemplateImageAsync(string templateName, string sourceImagePath)
+        {
+            var extension = Path.GetExtension(sourceImagePath);
+            var imageFileName = $"{GetSafeFileName(templateName)}{extension}";
+            var destinationPath = Path.Combine(_templateFolderPath, imageFileName);
+
+            if (Path.GetFullPath(sourceImagePath) == Path.GetFullPath(destinationPath))
+            {
+                return imageFileName;
+            }
+
+            await using var sourceStream = File.OpenRead(sourceImagePath);
+            await using var destinationStream = File.Create(destinationPath);
+            await sourceStream.CopyToAsync(destinationStream);
+
+            return imageFileName;
+        }
+
+        private static string GetSafeFileName(string fileName)
+        {
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var safeFileName = string.Join("_", fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)).Trim();
+
+            return string.IsNullOrWhiteSpace(safeFileName) ? "roi-template" : safeFileName;
         }
     }
 }
