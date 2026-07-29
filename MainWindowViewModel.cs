@@ -66,12 +66,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             try
             {
-                using var stream = File.OpenRead(filePath);
-                MainImage?.Dispose();
-
-                MainImage = new Bitmap(stream);
-                SelectedFileName = Path.GetFileName(filePath);
-                _selectedFilePath = filePath;
+                LoadImage(filePath);
             }
             catch (Exception ex)
             {
@@ -171,6 +166,59 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task LoadRoiTemplate()
+    {
+        var template = await _dialogService.OpenRoiTemplateLoadDialogAsync();
+        if (template is null)
+        {
+            Debug.WriteLine("ROI template load canceled.");
+            return;
+        }
+
+        var imagePath = _roiTemplateStorageService.GetTemplateImagePath(template);
+        if (!string.IsNullOrWhiteSpace(imagePath))
+        {
+            LoadImage(imagePath);
+        }
+
+        if (MainImage is null)
+        {
+            Debug.WriteLine("ROI template load failed: no image is available.");
+            return;
+        }
+
+        InspectionRegions.Clear();
+
+        foreach (var region in template.Regions)
+        {
+            var xRatio = Math.Clamp(region.X, 0d, 1d);
+            var yRatio = Math.Clamp(region.Y, 0d, 1d);
+            var widthRatio = Math.Clamp(region.Width, 0d, 1d);
+            var heightRatio = Math.Clamp(region.Height, 0d, 1d);
+            var regionName = string.IsNullOrWhiteSpace(region.Label)
+                ? $"ROI {InspectionRegions.Count + 1}"
+                : region.Label;
+
+            InspectionRegions.Add(new InspectionRegion
+            {
+                RegionId = regionName,
+                RegionName = regionName,
+                XRatio = xRatio,
+                YRatio = yRatio,
+                WidthRatio = widthRatio,
+                HeightRatio = heightRatio,
+                X = xRatio * MainImage.PixelSize.Width,
+                Y = yRatio * MainImage.PixelSize.Height,
+                Width = widthRatio * MainImage.PixelSize.Width,
+                Height = heightRatio * MainImage.PixelSize.Height
+            });
+        }
+
+        UpdateCurrentRoiState(0, 0, 0, 0, false);
+        Debug.WriteLine($"Loaded ROI template: {template.Name}");
+    }
+
+    [RelayCommand]
     private async Task DoOcr()
     {
         if (MainImage is null)
@@ -223,6 +271,18 @@ public partial class MainWindowViewModel : ObservableObject
         sKBitmap.Encode(webpStream, SKEncodedImageFormat.Webp, 100);
 
         return Task.FromResult(webpStream);
+    }
+
+    private void LoadImage(string filePath)
+    {
+        using var stream = File.OpenRead(filePath);
+        MainImage?.Dispose();
+
+        MainImage = new Bitmap(stream);
+        SelectedFileName = Path.GetFileName(filePath);
+        _selectedFilePath = filePath;
+        CurrentRoiCanvasWidth = MainImage.PixelSize.Width;
+        CurrentRoiCanvasHeight = MainImage.PixelSize.Height;
     }
 
 }

@@ -8,4 +8,6 @@ public interface IDialogService
     Task<string?> OpenFileDialogAsync(string title);
 
     Task<string?> OpenRoiTemplateNameDialogAsync();
+
+    Task<RoiTemplate?> OpenRoiTemplateLoadDialogAsync();
 }

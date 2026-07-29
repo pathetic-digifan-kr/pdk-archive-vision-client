@@ -10,10 +10,30 @@
     <Window.KeyBindings>
         <KeyBinding Gesture="Space" Command="{Binding AddRoiCommand}"/>
     </Window.KeyBindings>
-    <Grid Margin="20" RowDefinitions="Auto, *, Auto" ColumnDefinitions="*, 300">
+    <Grid Margin="20" RowDefinitions="Auto, Auto, *, Auto" ColumnDefinitions="*, 300">
+
+        <Menu Grid.Row="0"
+              Grid.Column="0"
+              Grid.ColumnSpan="2"
+              Margin="0,0,0,12">
+            <MenuItem Header="파일">
+                <MenuItem Header="이미지 열기"
+                          Command="{Binding OpenFileDialogCommand}" />
+            </MenuItem>
+            <MenuItem Header="템플릿">
+                <MenuItem Header="템플릿 불러오기"
+                          Command="{Binding LoadRoiTemplateCommand}" />
+                <MenuItem Header="현재 ROI 템플릿 저장"
+                          Command="{Binding SaveRoiTemplateCommand}" />
+            </MenuItem>
+            <MenuItem Header="OCR">
+                <MenuItem Header="OCR 분석 시작"
+                          Command="{Binding DoOcrCommand}" />
+            </MenuItem>
+        </Menu>
 
         <!-- ─── TOP HEADER ZONE: 컨트롤 및 파일 선택 라인 ─── -->
-        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                     Orientation="Horizontal" Spacing="15" Margin="0,0,0,20">
             <Button Content="📁 이미지 파일 선택"
                     Padding="15,8"
@@ -29,7 +49,7 @@
         </StackPanel>
 
         <!-- ─── LEFT MAIN ZONE: 이미지 뷰포트 영역 ─── -->
-        <Border Grid.Row="1" Grid.Column="0"
+        <Border Grid.Row="2" Grid.Column="0"
                 Background="#F5F5F5"
                 CornerRadius="8"
                 BorderBrush="#CCCCCC"
@@ -105,7 +125,7 @@
         </Border>
 
         <!-- ─── RIGHT SIDEBAR ZONE: 선택 영역 목록 (ROI List) ─── -->
-        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="Auto, *">
+        <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="Auto, *">
             <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,0,0,10">
                 <TextBlock Grid.Column="0"
                            Text="🎯 탐색 선택 영역 목록"
@@ -149,7 +169,7 @@
         </Grid>
 
         <!-- ─── BOTTOM STATUS ZONE: 파이썬 서버 비동기 통신 격발 라인 ─── -->
-        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
                     Margin="0,20,0,0" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="10">
             <Button Content="🖼️ 템플릿 저장"
                     Padding="16,10"
