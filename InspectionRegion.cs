@@ -26,5 +26,8 @@ public partial class InspectionRegion : ObservableObject
     private double _height;
 
     [ObservableProperty]
+    private bool _isSelected;
+
+    [ObservableProperty]
     private string _ocrResult = string.Empty;
 }

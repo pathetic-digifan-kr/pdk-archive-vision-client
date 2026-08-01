@@ -167,25 +167,7 @@
 
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Grid Width="{Binding Width}"
-                                                      Height="{Binding Height}">
-                                                    <Rectangle Stroke="#2563EB"
-                                                               Fill="#2563EB"
-                                                               Opacity="0.18"
-                                                               StrokeThickness="2" />
-                                                    <Border Background="#2563EB"
-                                                            CornerRadius="3"
-                                                            Padding="5,2"
-                                                            HorizontalAlignment="Left"
-                                                            VerticalAlignment="Top"
-                                                            MaxWidth="{Binding Width}">
-                                                        <TextBlock Text="{Binding RegionName}"
-                                                                   Foreground="White"
-                                                                   FontSize="16"
-                                                                   FontWeight="SemiBold"
-                                                                   TextTrimming="CharacterEllipsis" />
-                                                    </Border>
-                                                </Grid>
+                                                <local:SelectableRectangle/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>

@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="using:PdkOcrClient"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="PdkOcrClient.SelectableRectangle"
+             x:DataType="local:InspectionRegion"
+             >
+  <Grid Width="{Binding Width}"
+        Height="{Binding Height}">
+    <Rectangle Stroke="#2563EB"
+               Fill="#2563EB"
+               Opacity="0.18"
+               StrokeThickness="2" />
+    <Border Background="#2563EB"
+            CornerRadius="3"
+            Padding="5,2"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            MaxWidth="{Binding Width}">
+      <TextBlock Text="{Binding RegionName}"
+                 Foreground="White"
+                 FontSize="16"
+                 FontWeight="SemiBold"
+                 TextTrimming="CharacterEllipsis" />
+    </Border>
+  </Grid>
+</UserControl>
