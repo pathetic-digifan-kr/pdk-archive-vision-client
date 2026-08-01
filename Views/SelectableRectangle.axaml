@@ -6,24 +6,39 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="PdkOcrClient.SelectableRectangle"
              x:DataType="local:InspectionRegion"
-             >
-  <Grid Width="{Binding Width}"
-        Height="{Binding Height}">
-    <Rectangle Stroke="#2563EB"
-               Fill="#2563EB"
-               Opacity="0.18"
-               StrokeThickness="2" />
-    <Border Background="#2563EB"
-            CornerRadius="3"
-            Padding="5,2"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            MaxWidth="{Binding Width}">
-      <TextBlock Text="{Binding RegionName}"
-                 Foreground="White"
-                 FontSize="16"
-                 FontWeight="SemiBold"
-                 TextTrimming="CharacterEllipsis" />
-    </Border>
-  </Grid>
+             Cursor="Hand"
+             Background="Transparent"
+             IsHitTestVisible="True">
+  <Border x:Name="SelectionBorder"
+          BorderBrush="#2563EB"
+          BorderThickness="1"
+          CornerRadius="4"
+          Padding="2">
+    <Grid Width="{Binding Width}"
+          Height="{Binding Height}">
+      <Rectangle x:Name="RegionFill"
+                 Stroke="#2563EB"
+                 Fill="#2563EB"
+                 Opacity="0.18"
+                 StrokeThickness="2" />
+      <Rectangle x:Name="SelectionHighlight"
+                 IsVisible="False"
+                 Stroke="#38BDF8"
+                 Fill="#38BDF8"
+                 Opacity="0.12"
+                 StrokeThickness="3" />
+      <Border Background="#2563EB"
+              CornerRadius="3"
+              Padding="5,2"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Top"
+              MaxWidth="{Binding Width}">
+        <TextBlock Text="{Binding RegionName}"
+                   Foreground="White"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   TextTrimming="CharacterEllipsis" />
+      </Border>
+    </Grid>
+  </Border>
 </UserControl>
