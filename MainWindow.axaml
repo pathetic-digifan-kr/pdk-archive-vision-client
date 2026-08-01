@@ -151,26 +151,6 @@
                                            Stretch="None"
                                            Source="{Binding MainImage}" />
 
-                                    <ItemsControl ItemsSource="{Binding InspectionRegions}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <Canvas />
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-
-                                        <ItemsControl.Styles>
-                                            <Style Selector="ItemsControl > ContentPresenter" x:DataType="local:InspectionRegion">
-                                                <Setter Property="Canvas.Left" Value="{Binding X}" />
-                                                <Setter Property="Canvas.Top" Value="{Binding Y}" />
-                                            </Style>
-                                        </ItemsControl.Styles>
-
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <local:SelectableRectangle/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
 
                                     <Canvas Name="RoiCanvas"
                                             Background="Transparent"
@@ -188,6 +168,28 @@
                                                    Height="{Binding CurrentRoiHeight, Mode=TwoWay}"
                                                    IsVisible="{Binding CurrentRoiIsVisible}" />
                                     </Canvas>
+
+                                    <ItemsControl ItemsSource="{Binding InspectionRegions}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Canvas />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.Styles>
+                                            <Style Selector="ItemsControl > ContentPresenter" x:DataType="local:InspectionRegion">
+                                                <Setter Property="Canvas.Left" Value="{Binding X}" />
+                                                <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                                            </Style>
+                                        </ItemsControl.Styles>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <local:SelectableRectangle PointerPressed="SelectableRectangle_PointerPressed"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
                                 </Grid>
                             </Viewbox>
 
@@ -240,7 +242,8 @@
                              Background="Transparent"
                              BorderThickness="0"
                              Margin="8"
-                             ItemsSource="{Binding InspectionRegions}">
+                             ItemsSource="{Binding InspectionRegions}"
+                             >
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="#F8FAFC"

@@ -1,12 +1,22 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
 
 namespace PdkOcrClient;
 
 public partial class MainWindow : Window
 {
+    public static readonly StyledProperty<InspectionRegion?> SelectedInspectionRegionProperty =
+        AvaloniaProperty.Register<MainWindow, InspectionRegion?>(nameof(SelectedInspectionRegion));
+
+    public InspectionRegion? SelectedInspectionRegion
+    {
+        get => GetValue(SelectedInspectionRegionProperty);
+        set => SetValue(SelectedInspectionRegionProperty, value);
+    }
+
+    public SelectableRectangle? SelectedRectangle { get; private set; }
+
     private bool _isDrawing;
     private Point _roiStartPoint;
     private Point _roiCurrentPoint;
@@ -49,5 +59,24 @@ public partial class MainWindow : Window
         RoiRectangle.Width = width;
         RoiRectangle.Height = height;
         RoiRectangle.IsVisible = width > 0 && height > 0;
+    }
+
+    private void SelectableRectangle_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+    {
+        if (sender is not SelectableRectangle selectedRectangle)
+        {
+            return;
+        }
+
+        if(SelectedRectangle == sender){
+            return;
+        }
+
+        if (SelectedRectangle is not null && !ReferenceEquals(SelectedRectangle, selectedRectangle))
+        {
+            SelectedRectangle.IsSelected = false;
+        }
+
+        SelectedRectangle = selectedRectangle;
     }
 }

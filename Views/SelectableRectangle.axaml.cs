@@ -77,26 +77,7 @@ public partial class SelectableRectangle : UserControl
 
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (DataContext is not InspectionRegion currentRegion)
-        {
-            return;
-        }
-
-        var parentItemsControl = this.GetVisualParent<ItemsControl>();
-        if (parentItemsControl?.ItemsSource is IEnumerable<InspectionRegion> regions)
-        {
-            foreach (var region in regions)
-            {
-                region.IsSelected = ReferenceEquals(region, currentRegion);
-            }
-        }
-        else
-        {
-            currentRegion.IsSelected = true;
-        }
-
         SetCurrentValue(IsSelectedProperty, true);
-        e.Handled = true;
     }
 
     private void UpdateSelectionVisualState()
@@ -106,10 +87,6 @@ public partial class SelectableRectangle : UserControl
         var highlight = this.FindControl<Rectangle>("SelectionHighlight");
 
         var isSelected = IsSelected;
-        if (DataContext is InspectionRegion region)
-        {
-            isSelected = region.IsSelected;
-        }
 
         var selectedBorderBrush = new SolidColorBrush(Color.Parse("#38BDF8"));
         var defaultBorderBrush = new SolidColorBrush(Color.Parse("#2563EB"));
