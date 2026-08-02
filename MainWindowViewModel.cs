@@ -170,17 +170,20 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
+        /// ROI 위치 비율 업데이트
+        UpdateRoiPosition();
+
         var template = new RoiTemplate
         {
             Name = templateName,
-            Regions = InspectionRegions.Select(region => new RoiModel
+            Regions = [.. InspectionRegions.Select(region => new RoiModel
             {
                 Label = region.RegionName,
                 X = region.XRatio,
                 Y = region.YRatio,
                 Width = region.WidthRatio,
                 Height = region.HeightRatio
-            }).ToList()
+            })]
         };
 
         await _roiTemplateStorageService.SaveTemplateAsync(template, _selectedFilePath);
@@ -257,6 +260,8 @@ public partial class MainWindowViewModel : ObservableObject
 
         try
         {
+            UpdateRoiPosition();
+
             using var webpStream = await ConvertBitmapToWebpAsync(MainImage);
             var roiModels = InspectionRegions.Select(region => new RoiModel
             {
@@ -305,6 +310,27 @@ public partial class MainWindowViewModel : ObservableObject
         _selectedFilePath = filePath;
         CurrentRoiCanvasWidth = MainImage.PixelSize.Width;
         CurrentRoiCanvasHeight = MainImage.PixelSize.Height;
+    }
+
+    private void UpdateRoiPosition()
+    {
+        if(MainImage is null)
+        {
+            return;
+        }
+
+        foreach(var region in InspectionRegions)
+        {
+            var xRatio = Math.Clamp(region.X / MainImage.PixelSize.Width, 0d, 1d);
+            var yRatio = Math.Clamp(region.Y / MainImage.PixelSize.Height, 0d, 1d);
+            var widthRatio = Math.Clamp(region.Width / MainImage.PixelSize.Width, 0d, 1d);
+            var heightRatio = Math.Clamp(region.Height / MainImage.PixelSize.Height, 0d, 1d);
+
+            region.XRatio = xRatio;
+            region.YRatio = yRatio;
+            region.WidthRatio = widthRatio;
+            region.HeightRatio = heightRatio;
+        }
     }
 
 }
