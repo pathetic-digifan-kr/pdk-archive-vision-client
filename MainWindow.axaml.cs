@@ -6,6 +6,13 @@ namespace PdkOcrClient;
 
 public partial class MainWindow : Window
 {
+    private enum RoiInteractionState
+    {
+        None,
+        DrawingNewRegion,
+        MovingRegion
+    }
+
     public static readonly StyledProperty<object?> SelectedRectangleProperty =
         AvaloniaProperty.Register<MainWindow, object?>(nameof(SelectedRectangle));
 
@@ -15,9 +22,12 @@ public partial class MainWindow : Window
         set => SetValue(SelectedRectangleProperty, value);
     }
 
-    private bool _isDrawing;
+    private RoiInteractionState _interactionState = RoiInteractionState.None;
+    private InspectionRegion? _movingRegion;
     private Point _roiStartPoint;
     private Point _roiCurrentPoint;
+    private Point _interactionStartPoint;
+    private Point _movingRegionStartPosition;
 
     public MainWindow()
     {
@@ -26,23 +36,48 @@ public partial class MainWindow : Window
 
     private void RoiCanvas_PointerReleased(object? sender, Avalonia.Input.PointerReleasedEventArgs e)
     {
-        _isDrawing = false;
+        _interactionState = RoiInteractionState.None;
         e.Pointer.Capture(null);
     }
 
     private void RoiCanvas_PointerMoved(object? sender, Avalonia.Input.PointerEventArgs e)
     {
-        if (!_isDrawing) return;
+        if (_interactionState == RoiInteractionState.DrawingNewRegion)
+        {
+            _roiCurrentPoint = e.GetPosition(RoiCanvas);
+            e.Pointer.Capture(RoiCanvas);
+            UpdateRoiRectangleVisual();
+            return;
+        }
 
-        _roiCurrentPoint = e.GetPosition(RoiCanvas);
-        e.Pointer.Capture(RoiCanvas);
+        if (_interactionState == RoiInteractionState.MovingRegion && _movingRegion is not null)
+        {
+            var currentPoint = e.GetPosition(RoiCanvas);
+            var deltaX = currentPoint.X - _interactionStartPoint.X;
+            var deltaY = currentPoint.Y - _interactionStartPoint.Y;
 
-        UpdateRoiRectangleVisual();
+            var nextX = _movingRegionStartPosition.X + deltaX;
+            var nextY = _movingRegionStartPosition.Y + deltaY;
+            var maxX = Math.Max(0, RoiCanvas.Bounds.Width - _movingRegion.Width);
+            var maxY = Math.Max(0, RoiCanvas.Bounds.Height - _movingRegion.Height);
+
+            _movingRegion.X = Math.Clamp(nextX, 0, maxX);
+            _movingRegion.Y = Math.Clamp(nextY, 0, maxY);
+            e.Pointer.Capture(RoiCanvas);
+        }
     }
 
     private void RoiCanvas_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
-        _isDrawing = true;
+        if (e.Source != RoiCanvas)
+        {
+            return;
+        }
+
+        _interactionState = RoiInteractionState.DrawingNewRegion;
+        _movingRegion = null;
+        SetCurrentValue(SelectedRectangleProperty, null);
+
         _roiStartPoint = e.GetPosition(RoiCanvas);
         _roiCurrentPoint = _roiStartPoint;
         e.Pointer.Capture(RoiCanvas);
@@ -70,7 +105,19 @@ public partial class MainWindow : Window
         {
             return;
         }
-        SetCurrentValue(SelectedRectangleProperty, selectedRectangle.DataContext );
+
+        var region = selectedRectangle.DataContext as InspectionRegion;
+        if (region is null)
+        {
+            return;
+        }
+
+        _interactionState = RoiInteractionState.MovingRegion;
+        _movingRegion = region;
+        _interactionStartPoint = e.GetPosition(RoiCanvas);
+        _movingRegionStartPosition = new Point(region.X, region.Y);
+
+        SetCurrentValue(SelectedRectangleProperty, region);
         e.Pointer.Capture(RoiCanvas);
         e.Handled = true;
     }
