@@ -6,16 +6,14 @@ namespace PdkOcrClient;
 
 public partial class MainWindow : Window
 {
-    public static readonly StyledProperty<InspectionRegion?> SelectedInspectionRegionProperty =
-        AvaloniaProperty.Register<MainWindow, InspectionRegion?>(nameof(SelectedInspectionRegion));
+    public static readonly StyledProperty<object?> SelectedRectangleProperty =
+        AvaloniaProperty.Register<MainWindow, object?>(nameof(SelectedRectangle));
 
-    public InspectionRegion? SelectedInspectionRegion
+    public object? SelectedRectangle
     {
-        get => GetValue(SelectedInspectionRegionProperty);
-        set => SetValue(SelectedInspectionRegionProperty, value);
+        get => GetValue(SelectedRectangleProperty);
+        set => SetValue(SelectedRectangleProperty, value);
     }
-
-    public SelectableRectangle? SelectedRectangle { get; private set; }
 
     private bool _isDrawing;
     private Point _roiStartPoint;
@@ -29,6 +27,7 @@ public partial class MainWindow : Window
     private void RoiCanvas_PointerReleased(object? sender, Avalonia.Input.PointerReleasedEventArgs e)
     {
         _isDrawing = false;
+        e.Pointer.Capture(null);
     }
 
     private void RoiCanvas_PointerMoved(object? sender, Avalonia.Input.PointerEventArgs e)
@@ -36,6 +35,8 @@ public partial class MainWindow : Window
         if (!_isDrawing) return;
 
         _roiCurrentPoint = e.GetPosition(RoiCanvas);
+        e.Pointer.Capture(RoiCanvas);
+
         UpdateRoiRectangleVisual();
     }
 
@@ -44,6 +45,8 @@ public partial class MainWindow : Window
         _isDrawing = true;
         _roiStartPoint = e.GetPosition(RoiCanvas);
         _roiCurrentPoint = _roiStartPoint;
+        e.Pointer.Capture(RoiCanvas);
+
         UpdateRoiRectangleVisual();
     }
 
@@ -67,16 +70,8 @@ public partial class MainWindow : Window
         {
             return;
         }
-
-        if(SelectedRectangle == sender){
-            return;
-        }
-
-        if (SelectedRectangle is not null && !ReferenceEquals(SelectedRectangle, selectedRectangle))
-        {
-            SelectedRectangle.IsSelected = false;
-        }
-
-        SelectedRectangle = selectedRectangle;
+        SetCurrentValue(SelectedRectangleProperty, selectedRectangle.DataContext );
+        e.Pointer.Capture(RoiCanvas);
+        e.Handled = true;
     }
 }

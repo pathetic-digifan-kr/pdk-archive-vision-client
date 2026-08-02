@@ -67,11 +67,6 @@ public partial class SelectableRectangle : UserControl
         if (e.Property == IsSelectedProperty)
         {
             UpdateSelectionVisualState();
-
-            if (DataContext is InspectionRegion region)
-            {
-                region.IsSelected = (bool)e.NewValue!;
-            }
         }
     }
 

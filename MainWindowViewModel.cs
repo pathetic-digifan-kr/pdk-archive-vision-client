@@ -43,6 +43,28 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private double _currentRoiCanvasHeight = 1;
 
+    public InspectionRegion? SelectedInspectionRegion
+    {
+        get => _selectedInspectionRegion;
+        set
+        {
+            var prevInspectionRegion = _selectedInspectionRegion;
+            if (SetProperty(ref _selectedInspectionRegion, value))
+            {
+                if(prevInspectionRegion is not null && prevInspectionRegion.IsSelected)
+                {
+                    prevInspectionRegion.IsSelected = false;
+                }
+
+                if(value is not null && !value.IsSelected)
+                {
+                    value.IsSelected = true;
+                }
+            }
+        }
+    }
+    private InspectionRegion? _selectedInspectionRegion;
+
     private readonly IDialogService _dialogService;
     private readonly OcrClient _ocrClient;
     private readonly RoiTemplateStorageService _roiTemplateStorageService;

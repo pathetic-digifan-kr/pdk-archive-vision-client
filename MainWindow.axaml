@@ -13,7 +13,9 @@
         Height="720"
         MinWidth="900"
         MinHeight="620"
-        Background="#F3F5F8">
+        Background="#F3F5F8"
+        SelectedRectangle="{Binding SelectedInspectionRegion, Mode=TwoWay}"
+        >
     <Window.KeyBindings>
         <KeyBinding Gesture="Space" Command="{Binding AddRoiCommand}" />
     </Window.KeyBindings>
@@ -185,7 +187,7 @@
 
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <local:SelectableRectangle PointerPressed="SelectableRectangle_PointerPressed"/>
+                                                <local:SelectableRectangle PointerPressed="SelectableRectangle_PointerPressed" IsSelected="{Binding IsSelected, Mode=TwoWay}"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -243,6 +245,8 @@
                              BorderThickness="0"
                              Margin="8"
                              ItemsSource="{Binding InspectionRegions}"
+                             SelectionMode="Single"
+                             SelectedItem="{Binding SelectedInspectionRegion, Mode=TwoWay}"
                              >
                         <ListBox.ItemTemplate>
                             <DataTemplate>
