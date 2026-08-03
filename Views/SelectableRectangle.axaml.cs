@@ -80,6 +80,7 @@ public partial class SelectableRectangle : UserControl
         var border = this.FindControl<Border>("SelectionBorder");
         var fill = this.FindControl<Rectangle>("RegionFill");
         var highlight = this.FindControl<Rectangle>("SelectionHighlight");
+        var resizeHandles = this.FindControl<Grid>("SelectionHandles");
 
         var isSelected = IsSelected;
 
@@ -106,6 +107,11 @@ public partial class SelectableRectangle : UserControl
         if (highlight is not null)
         {
             highlight.IsVisible = isSelected;
+        }
+
+        if (resizeHandles is not null)
+        {
+            resizeHandles.IsVisible = isSelected;
         }
     }
 }
