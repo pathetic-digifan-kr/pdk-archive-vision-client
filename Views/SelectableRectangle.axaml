@@ -10,116 +10,150 @@
              Cursor="Hand"
              Background="Transparent"
              IsHitTestVisible="True">
-  <Border x:Name="SelectionBorder"
-          BorderBrush="#2563EB"
-          BorderThickness="1"
-          CornerRadius="4"
-          Padding="2"
-          ClipToBounds="False">
-    <Grid Width="{Binding Width}"
-          Height="{Binding Height}">
-      <Rectangle x:Name="RegionFill"
-                 Stroke="#2563EB"
-                 Fill="#2563EB"
-                 Opacity="0.18"
-                 StrokeThickness="2" />
-      <Rectangle x:Name="SelectionHighlight"
-                 IsVisible="False"
-                 Stroke="#38BDF8"
-                 Fill="#38BDF8"
-                 Opacity="0.12"
-                 StrokeThickness="3" />
-      <Grid x:Name="SelectionHandles"
-            IsVisible="False"
-            IsHitTestVisible="False"
-            Width="{Binding Width}"
-            Height="{Binding Height}"
-            ClipToBounds="False">
-        <Border Width="10"
-                Height="10"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
-                Margin="-5,-5,0,0"
-                Background="#F8FAFC"
-                BorderBrush="#38BDF8"
-                BorderThickness="2"
-                CornerRadius="2" />
-        <Border Width="10"
-                Height="10"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Top"
-                Margin="0,-5,0,0"
-                Background="#F8FAFC"
-                BorderBrush="#38BDF8"
-                BorderThickness="2"
-                CornerRadius="2" />
-        <Border Width="10"
-                Height="10"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Margin="0,-5,-5,0"
-                Background="#F8FAFC"
-                BorderBrush="#38BDF8"
-                BorderThickness="2"
-                CornerRadius="2" />
-        <Border Width="10"
-                Height="10"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                Margin="-5,0,0,0"
-                Background="#F8FAFC"
-                BorderBrush="#38BDF8"
-                BorderThickness="2"
-                CornerRadius="2" />
-        <Border Width="10"
-                Height="10"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                Margin="0,0,-5,0"
-                Background="#F8FAFC"
-                BorderBrush="#38BDF8"
-                BorderThickness="2"
-                CornerRadius="2" />
-        <Border Width="10"
-                Height="10"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Bottom"
-                Margin="-5,0,0,-5"
-                Background="#F8FAFC"
-                BorderBrush="#38BDF8"
-                BorderThickness="2"
-                CornerRadius="2" />
-        <Border Width="10"
-                Height="10"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Bottom"
-                Margin="0,0,0,-5"
-                Background="#F8FAFC"
-                BorderBrush="#38BDF8"
-                BorderThickness="2"
-                CornerRadius="2" />
-        <Border Width="10"
-                Height="10"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                Margin="0,0,-5,-5"
-                Background="#F8FAFC"
-                BorderBrush="#38BDF8"
-                BorderThickness="2"
-                CornerRadius="2" />
-      </Grid>
-      <Border Background="#2563EB"
-              CornerRadius="3"
-              Padding="5,2"
-              HorizontalAlignment="Left"
-              VerticalAlignment="Top"
-              MaxWidth="{Binding Width}">
-        <TextBlock Text="{Binding RegionName}"
-                   Foreground="White"
-                   FontSize="16"
-                   FontWeight="SemiBold"
-                   TextTrimming="CharacterEllipsis" />
-      </Border>
-    </Grid>
-  </Border>
+        <UserControl.Styles>
+                <Style Selector="local|SelectableRectangle">
+                        <Style Selector="^ Border#SelectionBorder">
+                                <Setter Property="BorderBrush" Value="#2563EB" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Setter Property="Padding" Value="2" />
+                        </Style>
+
+                        <Style Selector="^:selected Border#SelectionBorder">
+                                <Setter Property="BorderBrush" Value="#38BDF8" />
+                                <Setter Property="BorderThickness" Value="2" />
+                                <Setter Property="Padding" Value="3" />
+                        </Style>
+
+                        <Style Selector="^ Rectangle#RegionFill">
+                                <Setter Property="Stroke" Value="#2563EB" />
+                                <Setter Property="Fill" Value="#2563EB" />
+                                <Setter Property="StrokeThickness" Value="2" />
+                                <Setter Property="Opacity" Value="0.24" />
+                        </Style>
+
+                        <Style Selector="^:selected Rectangle#RegionFill">
+                                <Setter Property="Stroke" Value="#38BDF8" />
+                                <Setter Property="Fill" Value="#38BDF8" />
+                                <Setter Property="StrokeThickness" Value="3" />
+                                <Setter Property="Opacity" Value="0.18" />
+                        </Style>
+
+                        <Style Selector="^ Rectangle#SelectionHighlight">
+                                <Setter Property="IsVisible" Value="False" />
+                        </Style>
+                        <Style Selector="^:selected Rectangle#SelectionHighlight">
+                                <Setter Property="IsVisible" Value="True" />
+                        </Style>
+
+                        <Style Selector="^ Grid#SelectionHandles">
+                                <Setter Property="IsVisible" Value="False" />
+                        </Style>
+                        <Style Selector="^:selected Grid#SelectionHandles">
+                                <Setter Property="IsVisible" Value="True" />
+                        </Style>
+                </Style>
+        </UserControl.Styles>
+        <Border x:Name="SelectionBorder"
+                CornerRadius="4"
+                ClipToBounds="False">
+                <Grid Width="{Binding Width}"
+                      Height="{Binding Height}">
+                        <Rectangle x:Name="RegionFill"/>
+                        <Rectangle x:Name="SelectionHighlight"
+                                   Stroke="#38BDF8"
+                                   Fill="#38BDF8"
+                                   Opacity="0.12"
+                                   StrokeThickness="3" />
+                        <Grid x:Name="SelectionHandles"
+                              IsHitTestVisible="False"
+                              Width="{Binding Width}"
+                              Height="{Binding Height}"
+                              ClipToBounds="False">
+                                <Border Width="10"
+                                        Height="10"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Margin="-5,-5,0,0"
+                                        Background="#F8FAFC"
+                                        BorderBrush="#38BDF8"
+                                        BorderThickness="2"
+                                        CornerRadius="2" />
+                                <Border Width="10"
+                                        Height="10"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-5,0,0"
+                                        Background="#F8FAFC"
+                                        BorderBrush="#38BDF8"
+                                        BorderThickness="2"
+                                        CornerRadius="2" />
+                                <Border Width="10"
+                                        Height="10"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-5,-5,0"
+                                        Background="#F8FAFC"
+                                        BorderBrush="#38BDF8"
+                                        BorderThickness="2"
+                                        CornerRadius="2" />
+                                <Border Width="10"
+                                        Height="10"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Margin="-5,0,0,0"
+                                        Background="#F8FAFC"
+                                        BorderBrush="#38BDF8"
+                                        BorderThickness="2"
+                                        CornerRadius="2" />
+                                <Border Width="10"
+                                        Height="10"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,-5,0"
+                                        Background="#F8FAFC"
+                                        BorderBrush="#38BDF8"
+                                        BorderThickness="2"
+                                        CornerRadius="2" />
+                                <Border Width="10"
+                                        Height="10"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Bottom"
+                                        Margin="-5,0,0,-5"
+                                        Background="#F8FAFC"
+                                        BorderBrush="#38BDF8"
+                                        BorderThickness="2"
+                                        CornerRadius="2" />
+                                <Border Width="10"
+                                        Height="10"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Bottom"
+                                        Margin="0,0,0,-5"
+                                        Background="#F8FAFC"
+                                        BorderBrush="#38BDF8"
+                                        BorderThickness="2"
+                                        CornerRadius="2" />
+                                <Border Width="10"
+                                        Height="10"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        Margin="0,0,-5,-5"
+                                        Background="#F8FAFC"
+                                        BorderBrush="#38BDF8"
+                                        BorderThickness="2"
+                                        CornerRadius="2" />
+                        </Grid>
+                        <Border Background="#2563EB"
+                                CornerRadius="3"
+                                Padding="5,2"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                MaxWidth="{Binding Width}">
+                                <TextBlock Text="{Binding RegionName}"
+                                           Foreground="White"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           TextTrimming="CharacterEllipsis" />
+                        </Border>
+                </Grid>
+        </Border>
 </UserControl>
