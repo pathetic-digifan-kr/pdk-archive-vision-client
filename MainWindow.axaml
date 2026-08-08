@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PdkOcrClient"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         mc:Ignorable="d"
         d:DesignWidth="1100"
         d:DesignHeight="720"
@@ -155,10 +156,7 @@
 
 
                                     <Canvas Name="RoiCanvas"
-                                            Background="Transparent"
-                                            PointerPressed="RoiCanvas_PointerPressed"
-                                            PointerMoved="RoiCanvas_PointerMoved"
-                                            PointerReleased="RoiCanvas_PointerReleased">
+                                            Background="Transparent">
                                         <Rectangle Name="RoiRectangle"
                                                    Stroke="#DC2626"
                                                    Opacity="0.24"
@@ -180,14 +178,19 @@
 
                                         <ItemsControl.Styles>
                                             <Style Selector="ItemsControl > ContentPresenter" x:DataType="local:InspectionRegion">
-                                                <Setter Property="Canvas.Left" Value="{Binding X}" />
-                                                <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                                                <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}" />
+                                                <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}" />
                                             </Style>
                                         </ItemsControl.Styles>
 
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <local:SelectableRectangle PointerPressed="SelectableRectangle_PointerPressed" IsSelected="{Binding IsSelected, Mode=TwoWay}"/>
+                                                <local:SelectableRectangle PointerPressed="SelectableRectangle_PointerPressed"
+                                                                           IsSelected="{Binding IsSelected, Mode=TwoWay}">
+                                                    <i:Interaction.Behaviors>
+                                                        <local:DragMoveBehavior />
+                                                    </i:Interaction.Behaviors>
+                                                </local:SelectableRectangle>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
