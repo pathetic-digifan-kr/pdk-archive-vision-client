@@ -79,8 +79,7 @@ public partial class SelectableRectangle : UserControl
 
         var newPos = e.GetPosition(canvas);
 
-        // 현재값을 다시 읽지 않고, 순수하게 벡터만 누적
-
+        // 너비와 높이는 시작위치 기준으로 본래 너비, 높이에 위치 변화량을 더한 절대값
         Point dPos = newPos - _startPoint;
         double newWidth = Math.Abs(_startWidth + dPos.X);
         double newHeight = Math.Abs(_startHeight + dPos.Y);
@@ -88,18 +87,16 @@ public partial class SelectableRectangle : UserControl
         bool isLeft = newPos.X < _startLeft;
         bool isTop = newPos.Y < _startTop;
 
-
+        // 시작위치 기준 마우스가 좌측으로 넘어가는 경우 좌측으로 평행이동
         if (isLeft)
         {
             container.SetCurrentValue(Canvas.LeftProperty, newPos.X);
         }
+
+        // 시작위치 기준 마우스가 위로 넘어가는 경우 위로 평행이동
         if (isTop)
         {
             container.SetCurrentValue(Canvas.TopProperty, newPos.Y);
-        }
-        else
-        {
-            newHeight = Math.Max(MinHeight, _startHeight + dPos.Y);
         }
 
         this.SetCurrentValue(WidthProperty, newWidth);
