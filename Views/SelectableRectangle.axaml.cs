@@ -54,21 +54,6 @@ public partial class SelectableRectangle : UserControl
         SetCurrentValue(IsSelectedProperty, true);
     }
 
-    private void BottomRightHandle_DragStarted(object? sender, VectorEventArgs e)
-    {
-        var canvasChild = GetCanvasChild(this);
-        if (canvasChild is null)
-            return;
-
-        _startTop = Canvas.GetTop(canvasChild);
-        _startWidth = Width;
-        _startHeight = Height;
-
-        _isDragging = true;
-
-        e.Handled = true;
-    }
-
     private Control? GetCanvasChild(Control? start)
     {
         Visual? current = start;
