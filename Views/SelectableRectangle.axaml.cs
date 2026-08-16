@@ -12,21 +12,11 @@ namespace PdkOcrClient;
 
 public partial class SelectableRectangle : UserControl
 {
-    private double _startLeft;
-
-    private double _startTop;
-
-    private double _startWidth;
-
-    private double _startHeight;
-
     private double _pivotX;
 
     private double _pivotY;
 
     private bool _isDragging;
-
-    private Point _startPoint;
 
     private enum ResizeDirection
     {
@@ -98,56 +88,45 @@ public partial class SelectableRectangle : UserControl
         return true;
     }
 
-    private void ApplyResizeFromPointer(Control container, Canvas canvas, Point newPos)
+    private void ApplyResizeFromPointer(Control container, Canvas canvas, Point mouse)
     {
-        // 너비와 높이는 시작위치 기준으로 본래 너비, 높이에 위치 변화량을 더한 절대값
-        double newWidth = Math.Abs(_pivotX - newPos.X);
-        double newHeight = Math.Abs(_pivotY - newPos.Y);
+        // X좌표 시작점과 끝 점
+        var left = Math.Min(_pivotX, mouse.X);
+        var right = Math.Max(_pivotX, mouse.X);
 
-        // X, Y 좌표 기본 값은 본래 좌표
-        var newLeft = _pivotX;
-        var newTop = _pivotY;
+        // Y좌표 시작점과 끝 점
+        var top = Math.Min(_pivotY, mouse.Y);
+        var bottom = Math.Max(_pivotY, mouse.Y);
 
-        // 현재 좌표
-        var curLeft = Canvas.GetLeft(container);
-        var curTop = Canvas.GetTop(container);
-
-        // 시작위치 기준 마우스가 좌측으로 넘어가는 경우 좌측으로 평행이동
-        if (newPos.X < _pivotX)
+        // 중앙의 좌 우 핸들은 Y축을 변경하지 않는다.
+        if (_direction is ResizeDirection.CenterLeft or ResizeDirection.CenterRight)
         {
-            newLeft = Math.Clamp(newPos.X, 0, _pivotX);
-            newWidth = Math.Clamp(newWidth, 0, _pivotX);
+            top = Canvas.GetTop(container);
+            bottom = top + Height;
         }
-        else
+        // 중앙의 상 하 핸들은 X축을 변경하지 않는다.
+        else if (_direction is ResizeDirection.TopCenter or ResizeDirection.BottomCenter)
         {
-            newWidth = Math.Clamp(newWidth, 0, canvas.Bounds.Width - newLeft);
+            left = Canvas.GetLeft(container);
+            right = left + Width;
         }
 
+        // 범위 제한
+        left = Math.Clamp(left, 0, canvas.Bounds.Width);
+        top = Math.Clamp(top, 0, canvas.Bounds.Height);
+        right = Math.Clamp(right, 0, canvas.Bounds.Width);
+        bottom = Math.Clamp(bottom, 0, canvas.Bounds.Height);
 
-        // 시작위치 기준 마우스가 위로 넘어가는 경우 위로 평행이동
-        if (newPos.Y < _pivotY)
-        {
-            newTop = Math.Clamp(newPos.Y, 0, _pivotY);
-            newHeight = Math.Clamp(newHeight, 0, _pivotY);
-        }
-        else
-        {
-            newHeight = Math.Clamp(newHeight, 0, canvas.Bounds.Height - newTop);
-        }
+        // 위치 설정
+        if (Canvas.GetLeft(container) != left)
+            container.SetCurrentValue(Canvas.LeftProperty, left);
 
-        // 좌표값이 바뀐 경우에 한해 평행이동
-        if (curLeft != newLeft)
-        {
-            container.SetCurrentValue(Canvas.LeftProperty, newLeft);
-        }
+        if (Canvas.GetTop(container) != top)
+            container.SetCurrentValue(Canvas.TopProperty, top);
 
-        if (curTop != newTop)
-        {
-            container.SetCurrentValue(Canvas.TopProperty, newTop);
-        }
-
-        this.SetCurrentValue(WidthProperty, newWidth);
-        this.SetCurrentValue(HeightProperty, newHeight);
+        // 크기 설정
+        SetCurrentValue(WidthProperty, right - left);
+        SetCurrentValue(HeightProperty, bottom - top);
     }
 
     private void Handle_PointerMoved(object? sender, PointerEventArgs e)
@@ -158,18 +137,10 @@ public partial class SelectableRectangle : UserControl
         if (!TryGetCanvasContext(out var container, out var canvas))
             return;
 
-        var newPos = e.GetPosition(canvas!);
-
-        if(_direction == ResizeDirection.CenterRight || _direction == ResizeDirection.CenterLeft)
-        {
-            newPos = new Point(newPos.X, _pivotY + Height);
-        }
-        else if(_direction == ResizeDirection.BottomCenter || _direction == ResizeDirection.TopCenter)
-        {
-            newPos = new Point(_pivotX + Width, newPos.Y);
-        }
-
-        ApplyResizeFromPointer(container!, canvas!, newPos);
+        ApplyResizeFromPointer(
+            container!,
+            canvas!,
+            e.GetPosition(canvas));
 
         e.Handled = true;
     }
@@ -190,39 +161,34 @@ public partial class SelectableRectangle : UserControl
         if (!TryGetCanvasContext(out var container, out var canvas))
             return;
 
-        if(direction == ResizeDirection.BottomRight || direction == ResizeDirection.BottomCenter || direction == ResizeDirection.CenterRight || direction == ResizeDirection.TopRight || direction == ResizeDirection.TopCenter)
-        {
-            _pivotX = Canvas.GetLeft(container!);
-        }
-        else if(direction == ResizeDirection.BottomLeft || direction == ResizeDirection.CenterLeft || direction == ResizeDirection.TopLeft)
+        // 좌측의 점들을 잡은 경우 Pivot의 X 좌표가 우측으로 변경된다.
+        if(direction == ResizeDirection.BottomLeft || direction == ResizeDirection.CenterLeft || direction == ResizeDirection.TopLeft)
         {
             _pivotX = Canvas.GetLeft(container!) + Width;
         }
-
-        if(direction == ResizeDirection.BottomRight || direction == ResizeDirection.BottomLeft || direction == ResizeDirection.BottomCenter || direction == ResizeDirection.CenterRight || direction == ResizeDirection.CenterLeft)
+        // 그 외의 경우엔 Pivot의 X좌표는 좌측이다.
+        else
         {
-            _pivotY = Canvas.GetTop(container!);
+            _pivotX = Canvas.GetLeft(container!);
         }
-        else if(direction == ResizeDirection.TopRight || direction == ResizeDirection.TopCenter || direction == ResizeDirection.TopLeft)
+
+        // 상단의 점을 잡은 경우 pivot의 Y 좌표는 하단이다.
+        if(direction == ResizeDirection.TopRight || direction == ResizeDirection.TopCenter || direction == ResizeDirection.TopLeft)
         {
             _pivotY = Canvas.GetTop(container!) + Height;
         }
+        // 그 외의 경우 Pivot의 Y좌표는 상단이다.
+        else
+        {
+            _pivotY = Canvas.GetTop(container!);
+        }
 
         // Canvas 기준 마우스상의 현재 절대 좌표
-        _startPoint = e.GetPosition(canvas!);
-        _startLeft = Canvas.GetLeft(container!);
-        _startTop = Canvas.GetTop(container!);
         _direction = direction;
         _isDragging = true;
 
-        _direction = direction;
         e.Pointer.Capture(sender as Control);
         e.Handled = true;
-
-        _startWidth = Width;
-        _startHeight = Height;
-
-        Debug.WriteLine(direction);
     }
 
     private void Handle_PointerReleased(object? sender, PointerReleasedEventArgs e)
