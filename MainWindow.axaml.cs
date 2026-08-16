@@ -37,4 +37,5 @@ public partial class MainWindow : Window
 
         SetCurrentValue(SelectedRectangleProperty, selectedRectangle.DataContext);
     }
+
 }

@@ -55,6 +55,18 @@
         <Style Selector="TextBlock.muted">
             <Setter Property="Foreground" Value="#64748B" />
         </Style>
+        <Style Selector="Button.icon">
+            <Setter Property="Width" Value="26" />
+            <Setter Property="Height" Value="26" />
+            <Setter Property="MinWidth" Value="26" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#64748B" />
+            <Setter Property="BorderBrush" Value="#CBD5E1" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="Auto, Auto, *, Auto">
@@ -260,10 +272,43 @@
                                         Padding="10"
                                         Margin="0,0,0,8">
                                     <StackPanel Spacing="5">
-                                        <TextBlock Text="{Binding RegionName}"
-                                                   Foreground="#111827"
-                                                   FontWeight="SemiBold"
-                                                   TextWrapping="Wrap" />
+                                        <Grid ColumnDefinitions="*, Auto"
+                                              ColumnSpacing="6">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding RegionName}"
+                                                       Foreground="#111827"
+                                                       FontWeight="SemiBold"
+                                                       TextWrapping="Wrap"
+                                                       VerticalAlignment="Center"
+                                                       IsVisible="{Binding IsEditingName, Converter={x:Static BoolConverters.Not}}" />
+                                            <Button Grid.Column="1"
+                                                    Classes="icon"
+                                                    Content="✎"
+                                                    ToolTip.Tip="ROI 이름 수정"
+                                                    Command="{Binding StartEditingNameCommand}"
+                                                    IsVisible="{Binding IsEditingName, Converter={x:Static BoolConverters.Not}}" />
+                                            <TextBox Grid.Column="0"
+                                                     Name="RoiNameEditor"
+                                                     Text="{Binding RegionName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     Foreground="#111827"
+                                                     FontWeight="SemiBold"
+                                                     Watermark="ROI 이름"
+                                                     BorderBrush="#2563EB"
+                                                     Background="#FFFFFF"
+                                                     Padding="6,4"
+                                                     IsVisible="{Binding IsEditingName}">
+                                                <i:Interaction.Behaviors>
+                                                    <local:CommitTextBoxEditBehavior IsEditing="{Binding IsEditingName}"
+                                                                                     CompleteCommand="{Binding CompleteEditingNameCommand}" />
+                                                </i:Interaction.Behaviors>
+                                            </TextBox>
+                                            <Button Grid.Column="1"
+                                                    Classes="icon"
+                                                    Content="✓"
+                                                    ToolTip.Tip="ROI 이름 수정 완료"
+                                                    Command="{Binding CompleteEditingNameCommand}"
+                                                    IsVisible="{Binding IsEditingName}" />
+                                        </Grid>
                                         <TextBlock Foreground="#2563EB"
                                                    TextWrapping="Wrap">
                                             <Run Text="OCR 결과: " />
