@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -99,5 +100,47 @@ public class WindowDialogService : IDialogService
         }
 
         return null;
+    }
+
+    public async Task OpenImageDirectoryInspectionDialogAsync(
+        IReadOnlyList<ImageDirectoryInspectionRoiOption> roiOptions,
+        OcrClient ocrClient)
+    {
+        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop
+            || desktop.MainWindow is not Window mainWindow)
+        {
+            return;
+        }
+
+        var dialog = new PdkOcrClient.Dialog.ImageDirectoryInspectionDialog
+        {
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        };
+
+        var viewModel = new ImageDirectoryInspectionDialogViewModel(
+            roiOptions,
+            ocrClient,
+            () => SelectDirectoryAsync(mainWindow, "검사할 이미지 디렉토리 선택"),
+            () => dialog.Close());
+
+        dialog.DataContext = viewModel;
+        await dialog.ShowDialog(mainWindow);
+    }
+
+    private static async Task<string?> SelectDirectoryAsync(Window owner, string title)
+    {
+        var storageProvider = TopLevel.GetTopLevel(owner)?.StorageProvider;
+        if (storageProvider == null)
+        {
+            return null;
+        }
+
+        var folders = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        {
+            Title = title,
+            AllowMultiple = false
+        });
+
+        return folders.FirstOrDefault()?.Path.LocalPath;
     }
 }

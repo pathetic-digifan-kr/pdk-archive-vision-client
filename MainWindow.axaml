@@ -78,6 +78,8 @@
                 <MenuItem Header="파일">
                     <MenuItem Header="이미지 열기"
                               Command="{Binding OpenFileDialogCommand}" />
+                    <MenuItem Header="이미지 디렉토리 검사"
+                              Command="{Binding OpenImageDirectoryInspectionCommand}" />
                 </MenuItem>
                 <MenuItem Header="템플릿">
                     <MenuItem Header="템플릿 불러오기"

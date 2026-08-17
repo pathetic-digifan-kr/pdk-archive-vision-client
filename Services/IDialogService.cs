@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace PdkOcrClient.Services;
 
@@ -10,4 +11,8 @@ public interface IDialogService
     Task<string?> OpenRoiTemplateNameDialogAsync();
 
     Task<RoiTemplate?> OpenRoiTemplateLoadDialogAsync();
+
+    Task OpenImageDirectoryInspectionDialogAsync(
+        IReadOnlyList<ImageDirectoryInspectionRoiOption> roiOptions,
+        OcrClient ocrClient);
 }

@@ -1,0 +1,187 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:PdkOcrClient.ViewModels"
+        xmlns:services="clr-namespace:PdkOcrClient.Services"
+        mc:Ignorable="d"
+        d:DesignWidth="780"
+        d:DesignHeight="560"
+        x:Class="PdkOcrClient.Dialog.ImageDirectoryInspectionDialog"
+        x:DataType="vm:ImageDirectoryInspectionDialogViewModel"
+        Title="이미지 디렉토리 검사"
+        Width="780"
+        Height="560"
+        MinWidth="720"
+        MinHeight="500"
+        Background="#F7F7F7">
+    <Grid RowDefinitions="Auto, *, Auto"
+          Margin="16"
+          RowSpacing="12">
+        <Border Grid.Row="0"
+                Background="White"
+                BorderBrush="#CCCCCC"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="14">
+            <Grid RowDefinitions="Auto, Auto, Auto, Auto"
+                  RowSpacing="10">
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="*, Auto"
+                      ColumnSpacing="8">
+                    <TextBox Grid.Column="0"
+                             Text="{Binding DirectoryPath, Mode=TwoWay}"
+                             Watermark="검사할 디렉토리"
+                             Padding="10,8" />
+                    <Button Grid.Column="1"
+                            Content="디렉토리 선택"
+                            Padding="14,8"
+                            Command="{Binding SelectDirectoryCommand}" />
+                </Grid>
+
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="*, Auto, Auto"
+                      ColumnSpacing="10">
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="검색 패턴"
+                                   FontWeight="SemiBold" />
+                        <TextBox Text="{Binding SearchPatterns, Mode=TwoWay}"
+                                 Padding="10,8" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="4">
+                        <TextBlock Text="최대 개수"
+                                   FontWeight="SemiBold" />
+                        <NumericUpDown Value="{Binding MaxImageCount, Mode=TwoWay}"
+                                       Minimum="1"
+                                       Maximum="100000"
+                                       Width="120" />
+                    </StackPanel>
+
+                    <CheckBox Grid.Column="2"
+                              Content="하위 폴더 포함"
+                              IsChecked="{Binding IncludeSubdirectories, Mode=TwoWay}"
+                              VerticalAlignment="Bottom"
+                              Margin="0,0,0,8" />
+                </Grid>
+
+                <Border Grid.Row="2"
+                        Background="#F8FAFC"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="10">
+                    <Grid RowDefinitions="Auto, Auto"
+                          RowSpacing="8">
+                        <CheckBox Grid.Row="0"
+                                  Content="선택 ROI의 OCR 결과가 기대값과 일치하는 이미지만 처리"
+                                  IsChecked="{Binding IsRoiConditionEnabled, Mode=TwoWay}" />
+
+                        <Grid Grid.Row="1"
+                              ColumnDefinitions="*, *, Auto"
+                              ColumnSpacing="10"
+                              IsEnabled="{Binding IsRoiConditionEnabled}">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="조건 ROI"
+                                           FontWeight="SemiBold" />
+                                <ComboBox ItemsSource="{Binding RoiOptions}"
+                                          SelectedItem="{Binding SelectedRoiOption, Mode=TwoWay}"
+                                          MinHeight="34">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="services:ImageDirectoryInspectionRoiOption">
+                                            <TextBlock Text="{Binding DisplayName}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <TextBlock Text="예상 값"
+                                           FontWeight="SemiBold" />
+                                <TextBox Text="{Binding ExpectedRoiValue, Mode=TwoWay}"
+                                         Watermark="예: OK"
+                                         Padding="10,8" />
+                            </StackPanel>
+
+                            <CheckBox Grid.Column="2"
+                                      Content="일치 항목만 표시"
+                                      IsChecked="{Binding ShowOnlyExpectedMatches, Mode=TwoWay}"
+                                      VerticalAlignment="Bottom"
+                                      Margin="0,0,0,8" />
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="3"
+                      ColumnDefinitions="*, Auto"
+                      ColumnSpacing="10">
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding StatusText}"
+                               Foreground="#666666"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap" />
+                    <Button Grid.Column="1"
+                            Content="검사"
+                            Padding="16,8"
+                            Background="#2b579a"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            Command="{Binding InspectDirectoryCommand}" />
+                </Grid>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1"
+                Background="White"
+                BorderBrush="#CCCCCC"
+                BorderThickness="1"
+                CornerRadius="6">
+            <ListBox ItemsSource="{Binding Images}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     Margin="6">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ImageInspectionItem">
+                        <Grid ColumnDefinitions="*, Auto, Auto"
+                              ColumnSpacing="12"
+                              Margin="4"
+                              MinHeight="44">
+                            <StackPanel Grid.Column="0" Spacing="2">
+                                <TextBlock Text="{Binding FileName}"
+                                           FontWeight="SemiBold"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding DirectoryName}"
+                                           Foreground="#666666"
+                                           FontSize="12"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding OcrText}"
+                                           Foreground="#0F766E"
+                                           FontSize="12"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding SizeText}"
+                                       Foreground="#2b579a"
+                                       VerticalAlignment="Center"
+                                       FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding StatusText}"
+                                       VerticalAlignment="Center"
+                                       Foreground="#333333" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="10">
+            <Button Content="닫기"
+                    IsCancel="True"
+                    Padding="16,8"
+                    Command="{Binding CloseCommand}" />
+        </StackPanel>
+    </Grid>
+</Window>

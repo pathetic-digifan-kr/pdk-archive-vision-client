@@ -244,6 +244,24 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task OpenImageDirectoryInspection()
+    {
+        UpdateRoiPosition();
+
+        var roiOptions = InspectionRegions
+            .Select(region => new ImageDirectoryInspectionRoiOption(
+                region.RegionId,
+                region.RegionName,
+                region.XRatio,
+                region.YRatio,
+                region.WidthRatio,
+                region.HeightRatio))
+            .ToList();
+
+        await _dialogService.OpenImageDirectoryInspectionDialogAsync(roiOptions, _ocrClient);
+    }
+
+    [RelayCommand]
     private async Task DoOcr()
     {
         if (MainImage is null)
