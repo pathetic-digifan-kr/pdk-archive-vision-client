@@ -168,7 +168,10 @@
 
 
                                     <Canvas Name="RoiCanvas"
-                                            Background="Transparent">
+                                            Background="Transparent"
+                                            PointerPressed="RoiCanvas_PointerPressed"
+                                            PointerMoved="RoiCanvas_PointerMoved"
+                                            PointerReleased="RoiCanvas_PointerReleased">
                                         <Rectangle Name="RoiRectangle"
                                                    Stroke="#DC2626"
                                                    Opacity="0.24"
