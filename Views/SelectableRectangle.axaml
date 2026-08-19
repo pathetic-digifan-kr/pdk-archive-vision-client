@@ -9,8 +9,8 @@
              x:Name="Root"
              Cursor="Hand"
              Background="Transparent"
-             Width="{Binding Width}"
-             Height="{Binding Height}"
+             Width="{Binding Width, Mode=TwoWay}"
+             Height="{Binding Height, Mode=TwoWay}"
              IsHitTestVisible="True">
         <UserControl.Styles>
                 <Style Selector="local|SelectableRectangle">
