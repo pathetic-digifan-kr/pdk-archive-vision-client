@@ -162,17 +162,32 @@ public partial class ImageDirectoryInspectionDialogViewModel : ObservableObject
                 ?.Trim() ?? string.Empty;
             var expectedValue = ExpectedRoiValue.Trim();
             var isMatched = string.Equals(ocrText, expectedValue, StringComparison.Ordinal);
-            var statusText = isMatched ? "조건 일치" : "조건 불일치";
+
+            // 대상의 검사 조건을 만족할 경우 검사
+            if (isMatched)
+            {
+                var remainRois = RoiOptions.Where(x => x != SelectedRoiOption);
+                response = await _ocrClient.SendOcrRequestAsync(
+                    webpStream,
+                    [.. remainRois.Select(x => x.ToRoiModel())],
+                    cancellationToken
+                );
+
+                return new ImageInspectionItem(
+                imagePath,
+                width,
+                height,
+                true,
+                $"통과 : {ocrText}", isConditionMatched:true);
+            }
 
             return new ImageInspectionItem(
                 imagePath,
                 width,
                 height,
                 true,
-                statusText,
-                ocrText,
-                expectedValue,
-                isMatched);
+                $"불일치 결과 : {ocrText}");
+
         }
         catch (Exception ex)
         {
