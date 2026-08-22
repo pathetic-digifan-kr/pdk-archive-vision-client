@@ -203,7 +203,9 @@
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <local:SelectableRectangle PointerPressed="SelectableRectangle_PointerPressed"
-                                                                           IsSelected="{Binding IsSelected, Mode=TwoWay}">
+                                                                           IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                                                                           Width="{Binding Width, Mode=TwoWay}"
+                                                                           Height="{Binding Height, Mode=TwoWay}">
                                                     <i:Interaction.Behaviors>
                                                         <local:DragMoveBehavior />
                                                     </i:Interaction.Behaviors>

@@ -45,8 +45,6 @@ public partial class SelectableRectangle : UserControl
     public SelectableRectangle()
     {
         InitializeComponent();
-        PointerPressed += OnPointerPressed;
-        PropertyChanged += OnPropertyChanged;
     }
 
     private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)

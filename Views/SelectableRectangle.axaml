@@ -9,9 +9,10 @@
              x:Name="Root"
              Cursor="Hand"
              Background="Transparent"
-             Width="{Binding Width, Mode=TwoWay}"
-             Height="{Binding Height, Mode=TwoWay}"
-             IsHitTestVisible="True">
+             IsHitTestVisible="True"
+             PointerPressed="OnPointerPressed"
+             PropertyChanged="OnPropertyChanged"
+             >
         <UserControl.Styles>
                 <Style Selector="local|SelectableRectangle">
                         <Style Selector="^ Grid#SelectionHandles Thumb">
