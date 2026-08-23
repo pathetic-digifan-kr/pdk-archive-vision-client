@@ -171,7 +171,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         /// ROI 위치 비율 업데이트
-        UpdateRoiPosition();
+        UpdateRoiRatiosFromPixels();
 
         var template = new RoiTemplate
         {
@@ -246,7 +246,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenImageDirectoryInspection()
     {
-        UpdateRoiPosition();
+        UpdateRoiRatiosFromPixels();
 
         var roiOptions = InspectionRegions
             .Select(region => new ImageDirectoryInspectionRoiOption(
@@ -278,7 +278,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         try
         {
-            UpdateRoiPosition();
+            UpdateRoiRatiosFromPixels();
 
             using var webpStream = await ConvertBitmapToWebpAsync(MainImage);
             var roiModels = InspectionRegions.Select(region => new RoiModel
@@ -328,9 +328,38 @@ public partial class MainWindowViewModel : ObservableObject
         _selectedFilePath = filePath;
         CurrentRoiCanvasWidth = MainImage.PixelSize.Width;
         CurrentRoiCanvasHeight = MainImage.PixelSize.Height;
+        UpdateRoiPixelsFromRatios();
     }
 
-    private void UpdateRoiPosition()
+    private void UpdateRoiPixelsFromRatios()
+    {
+        if (MainImage is null)
+        {
+            return;
+        }
+
+        var imageWidth = MainImage.PixelSize.Width;
+        var imageHeight = MainImage.PixelSize.Height;
+
+        foreach (var region in InspectionRegions)
+        {
+            var xRatio = Math.Clamp(region.XRatio, 0d, 1d);
+            var yRatio = Math.Clamp(region.YRatio, 0d, 1d);
+            var widthRatio = Math.Clamp(region.WidthRatio, 0d, 1d - xRatio);
+            var heightRatio = Math.Clamp(region.HeightRatio, 0d, 1d - yRatio);
+
+            region.XRatio = xRatio;
+            region.YRatio = yRatio;
+            region.WidthRatio = widthRatio;
+            region.HeightRatio = heightRatio;
+            region.X = xRatio * imageWidth;
+            region.Y = yRatio * imageHeight;
+            region.Width = widthRatio * imageWidth;
+            region.Height = heightRatio * imageHeight;
+        }
+    }
+
+    private void UpdateRoiRatiosFromPixels()
     {
         if(MainImage is null)
         {
