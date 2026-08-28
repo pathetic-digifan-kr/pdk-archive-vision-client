@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -16,6 +15,22 @@ public class OcrClient
 {
     private readonly HttpClient _httpClient;
     private readonly string _baseUrl;
+
+    /// <summary>
+    /// 메시지를 보낼 때는 Camel case로 보낸다.
+    /// </summary>
+    private readonly JsonSerializerOptions jsonSendOption = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
+    /// <summary>
+    /// 메시지를 받을 때는 대소문자를 따지지 않고 받는다.
+    /// </summary>
+    private readonly JsonSerializerOptions jsonRecvOption = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public OcrClient(string? baseUrl = null, HttpClient? httpClient = null)
     {
@@ -34,42 +49,43 @@ public class OcrClient
         IReadOnlyList<RoiModel> regions,
         CancellationToken cancellationToken = default)
     {
-        if (imageStream is null)
+        if (regions.Count == 0)
         {
-            throw new ArgumentNullException(nameof(imageStream));
-        }
-
-        if (regions is null)
-        {
-            throw new ArgumentNullException(nameof(regions));
+            throw new ArgumentException("ROI의 개수가 0입니다.", nameof(regions));
         }
 
         using var content = new MultipartFormDataContent();
 
-        imageStream.Position = 0;
+        if (imageStream.CanSeek)
+        {
+            imageStream.Position = 0;
+        }
+
         var fileName = "image.webp";
         var imageBytes = await ReadAllBytesAsync(imageStream, cancellationToken);
+        if (imageBytes.Length == 0)
+        {
+            throw new InvalidOperationException("불러온 이미지의 길이가 0 입니다.");
+        }
+
         var imageContent = new ByteArrayContent(imageBytes);
         imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/webp");
         content.Add(imageContent, "file", fileName);
 
-        var regionsJson = JsonSerializer.Serialize(regions, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
+        var regionsJson = JsonSerializer.Serialize(regions, jsonSendOption);
 
         var regionsContent = new StringContent(regionsJson, Encoding.UTF8, "application/json");
         content.Add(regionsContent, "zones_json");
 
         using var response = await _httpClient.PostAsync($"{_baseUrl}/vision/ocr-pipeline", content, cancellationToken);
-        var responseBody = await response.Content.ReadFromJsonAsync<RoiResponse>(cancellationToken);
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new HttpRequestException($"OCR request failed with status {(int)response.StatusCode}: {responseBody}");
+            throw new HttpRequestException($"OCR 요청이 실패했습니다. : {(int)response.StatusCode}: {responseBody}");
         }
 
-        return responseBody;
+        return JsonSerializer.Deserialize<RoiResponse>(responseBody, jsonRecvOption);
     }
 
     public async Task<RoiResponse?> SendOcrRequestAsync(

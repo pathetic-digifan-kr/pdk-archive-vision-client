@@ -9,7 +9,6 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PdkOcrClient.Services;
-using SkiaSharp;
 
 namespace PdkOcrClient.ViewModels;
 
@@ -150,7 +149,7 @@ public partial class ImageDirectoryInspectionDialogViewModel : ObservableObject
                     "정상");
             }
 
-            using var webpStream = ConvertImageToWebpStream(imagePath);
+            using var webpStream = ImageEncodingService.ConvertImageFileToWebpStream(imagePath);
             var response = await _ocrClient.SendOcrRequestAsync(
                 webpStream,
                 [SelectedRoiOption.ToRoiModel()],
@@ -166,12 +165,15 @@ public partial class ImageDirectoryInspectionDialogViewModel : ObservableObject
             // 대상의 검사 조건을 만족할 경우 검사
             if (isMatched)
             {
-                var remainRois = RoiOptions.Where(x => x != SelectedRoiOption);
-                response = await _ocrClient.SendOcrRequestAsync(
-                    webpStream,
-                    [.. remainRois.Select(x => x.ToRoiModel())],
-                    cancellationToken
-                );
+                var remainRois = RoiOptions.Where(x => x != SelectedRoiOption).ToList();
+                if (remainRois.Count > 0)
+                {
+                    response = await _ocrClient.SendOcrRequestAsync(
+                        webpStream,
+                        [.. remainRois.Select(x => x.ToRoiModel())],
+                        cancellationToken
+                    );
+                }
 
                 return new ImageInspectionItem(
                 imagePath,
@@ -207,20 +209,6 @@ public partial class ImageDirectoryInspectionDialogViewModel : ObservableObject
         }
     }
 
-    private static MemoryStream ConvertImageToWebpStream(string imagePath)
-    {
-        using var bitmap = SKBitmap.Decode(imagePath);
-        if (bitmap is null)
-        {
-            throw new InvalidOperationException("이미지를 디코딩할 수 없습니다.");
-        }
-
-        var stream = new MemoryStream();
-        bitmap.Encode(stream, SKEncodedImageFormat.Webp, 100);
-        stream.Position = 0;
-
-        return stream;
-    }
 }
 
 public sealed class ImageInspectionItem

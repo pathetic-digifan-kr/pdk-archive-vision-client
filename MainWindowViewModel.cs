@@ -8,7 +8,6 @@ using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PdkOcrClient.Services;
-using SkiaSharp;
 
 namespace PdkOcrClient;
 public partial class MainWindowViewModel : ObservableObject
@@ -280,7 +279,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             UpdateRoiRatiosFromPixels();
 
-            using var webpStream = await ConvertBitmapToWebpAsync(MainImage);
+            using var webpStream = await ImageEncodingService.ConvertBitmapToWebpAsync(MainImage);
             var roiModels = InspectionRegions.Select(region => new RoiModel
             {
                 Label = region.RegionId,
@@ -303,19 +302,6 @@ public partial class MainWindowViewModel : ObservableObject
         {
             Debug.WriteLine($"OCR 실행 실패: {ex.Message}");
         }
-    }
-
-    private static Task<MemoryStream> ConvertBitmapToWebpAsync(Bitmap bitmap)
-    {
-        var pngStream = new MemoryStream();
-        bitmap.Save(pngStream);
-        pngStream.Position = 0;
-
-        using var sKBitmap = SKBitmap.Decode(pngStream);
-        var webpStream = new MemoryStream();
-        sKBitmap.Encode(webpStream, SKEncodedImageFormat.Webp, 100);
-
-        return Task.FromResult(webpStream);
     }
 
     private void LoadImage(string filePath)
