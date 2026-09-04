@@ -22,7 +22,7 @@
                                    FontSize="14"
                                    Foreground="#333333" />
                         <TextBox Text="{Binding TemplateName, Mode=TwoWay}"
-                                 Watermark="템플릿 이름을 입력하세요"
+                                 PlaceholderText="템플릿 이름을 입력하세요"
                                  Padding="10,8"
                                  BorderBrush="#CCCCCC" />
 

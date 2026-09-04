@@ -31,7 +31,7 @@
                       ColumnSpacing="8">
                     <TextBox Grid.Column="0"
                              Text="{Binding DirectoryPath, Mode=TwoWay}"
-                             Watermark="검사할 디렉토리"
+                             PlaceholderText="검사할 디렉토리"
                              Padding="10,8" />
                     <Button Grid.Column="1"
                             Content="디렉토리 선택"
@@ -99,7 +99,7 @@
                                 <TextBlock Text="예상 값"
                                            FontWeight="SemiBold" />
                                 <TextBox Text="{Binding ExpectedRoiValue, Mode=TwoWay}"
-                                         Watermark="예: OK"
+                                         PlaceholderText="예: OK"
                                          Padding="10,8" />
                             </StackPanel>
 

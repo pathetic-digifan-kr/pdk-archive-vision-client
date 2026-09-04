@@ -300,7 +300,7 @@
                                                      Text="{Binding RegionName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                      Foreground="#111827"
                                                      FontWeight="SemiBold"
-                                                     Watermark="ROI 이름"
+                                                     PlaceholderText="ROI 이름"
                                                      BorderBrush="#2563EB"
                                                      Background="#FFFFFF"
                                                      Padding="6,4"
