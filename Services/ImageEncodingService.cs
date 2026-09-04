@@ -11,7 +11,7 @@ public static class ImageEncodingService
     public static Task<MemoryStream> ConvertBitmapToWebpAsync(Bitmap bitmap)
     {
         var pngStream = new MemoryStream();
-        bitmap.Save(pngStream);
+        bitmap.Save(pngStream, PngBitmapEncoderOptions.Default);
         pngStream.Position = 0;
 
         using var skBitmap = SKBitmap.Decode(pngStream) ?? throw new InvalidOperationException("이미지를 디코딩할 수 없습니다.");
