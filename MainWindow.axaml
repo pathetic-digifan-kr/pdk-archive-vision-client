@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PdkOcrClient"
-        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:i="using:Avalonia.Xaml.Interactivity"
         mc:Ignorable="d"
         d:DesignWidth="1100"
         d:DesignHeight="720"
@@ -16,6 +16,7 @@
         MinHeight="620"
         Background="#F3F5F8"
         SelectedRectangle="{Binding SelectedInspectionRegion, Mode=TwoWay}"
+        FontFamily="avares://PdkOcrClient/Assets/Fonts/Nanum_Gothic#NanumGothic"
         >
     <Window.KeyBindings>
         <KeyBinding Gesture="Space" Command="{Binding AddRoiCommand}" />
