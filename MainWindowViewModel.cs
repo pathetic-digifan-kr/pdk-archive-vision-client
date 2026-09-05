@@ -3,6 +3,9 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -68,6 +71,12 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly OcrClient _ocrClient;
     private readonly RoiTemplateStorageService _roiTemplateStorageService;
     private string? _selectedFilePath;
+
+    private JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+    };
 
     public MainWindowViewModel(
         IDialogService dialogService,
@@ -301,6 +310,45 @@ public partial class MainWindowViewModel : ObservableObject
         catch (Exception ex)
         {
             Debug.WriteLine($"OCR 실행 실패: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private async Task SaveOcrResult()
+    {
+        if (InspectionRegions.Count == 0)
+        {
+            Debug.WriteLine("OCR 결과 저장 실패: ROI가 없습니다.");
+            return;
+        }
+
+        var defaultFileName = string.IsNullOrWhiteSpace(SelectedFileName)
+            ? "ocr-results.json"
+            : $"{Path.GetFileNameWithoutExtension(SelectedFileName)}-ocr-results.json";
+        var filePath = await _dialogService.SaveFileDialogAsync("OCR 결과 저장", defaultFileName);
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            Debug.WriteLine("OCR 결과 저장이 취소되었습니다.");
+            return;
+        }
+
+        try
+        {
+            // 중복 방지로 groupBy를 사용하여 마지막 OCR 결과만 저장
+            var ocrResults = InspectionRegions
+            .GroupBy(region => region.RegionName)
+            .ToDictionary(
+                group => group.Key,
+                group => group.Last().OcrResult);
+
+            await using var stream = File.Create(filePath);
+            await JsonSerializer.SerializeAsync(stream, ocrResults, _jsonSerializerOptions);
+
+            Debug.WriteLine($"OCR 결과 저장 완료: {filePath}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"OCR 결과 저장 실패: {ex.Message}");
         }
     }
 

@@ -38,6 +38,34 @@ public class WindowDialogService : IDialogService
         return null;
     }
 
+    public async Task<string?> SaveFileDialogAsync(string title, string defaultFileName)
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+            && desktop.MainWindow is Window mainWindow)
+        {
+            var storageProvider = TopLevel.GetTopLevel(mainWindow)?.StorageProvider;
+            if (storageProvider == null) return null;
+
+            var file = await storageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = title,
+                SuggestedFileName = defaultFileName,
+                DefaultExtension = "json",
+                FileTypeChoices =
+                [
+                    new FilePickerFileType("JSON 파일")
+                    {
+                        Patterns = ["*.json"]
+                    }
+                ]
+            });
+
+            return file?.TryGetLocalPath();
+        }
+
+        return null;
+    }
+
     public async Task<string?> OpenRoiTemplateNameDialogAsync()
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop

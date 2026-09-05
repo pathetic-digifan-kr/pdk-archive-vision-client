@@ -347,7 +347,8 @@
                             Content="템플릿 저장"
                             Command="{Binding SaveRoiTemplateCommand}" />
                     <Button Classes="secondary"
-                            Content="OCR 결과 저장" />
+                            Content="OCR 결과 저장"
+                            Command="{Binding SaveOcrResultCommand}" />
                 </StackPanel>
 
                 <Button Grid.Column="1"
