@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PdkOcrClient"
+        xmlns:models="clr-namespace:PdkOcrClient.Models"
         xmlns:i="using:Avalonia.Xaml.Interactivity"
         mc:Ignorable="d"
         d:DesignWidth="1100"
@@ -195,7 +196,7 @@
                                         </ItemsControl.ItemsPanel>
 
                                         <ItemsControl.Styles>
-                                            <Style Selector="ItemsControl > ContentPresenter" x:DataType="local:InspectionRegion">
+                                            <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:InspectionRegion">
                                                 <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}" />
                                                 <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}" />
                                             </Style>

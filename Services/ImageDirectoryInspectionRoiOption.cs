@@ -1,3 +1,5 @@
+using PdkOcrClient.Models;
+
 namespace PdkOcrClient.Services;
 
 public sealed record ImageDirectoryInspectionRoiOption(

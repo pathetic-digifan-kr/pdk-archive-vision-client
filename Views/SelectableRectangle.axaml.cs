@@ -7,6 +7,7 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using PdkOcrClient.Models;
 
 namespace PdkOcrClient;
 

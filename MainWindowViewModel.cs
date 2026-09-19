@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PdkOcrClient.Models;
 using PdkOcrClient.Services;
 
 namespace PdkOcrClient;

@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
+using PdkOcrClient.Models;
 using PdkOcrClient.ViewModels;
 
 namespace PdkOcrClient.Services;
