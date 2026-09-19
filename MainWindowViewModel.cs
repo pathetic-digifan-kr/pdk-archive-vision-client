@@ -184,8 +184,9 @@ public partial class MainWindowViewModel : ObservableObject
         var template = new RoiTemplate
         {
             Name = templateName,
-            Regions = [.. InspectionRegions.Select(region => new RoiModel
+            Regions = [.. InspectionRegions.Select(region => new RoiTemplateRegion
             {
+                Id = region.RegionId,
                 Label = region.RegionName,
                 X = region.XRatio,
                 Y = region.YRatio,
@@ -234,7 +235,10 @@ public partial class MainWindowViewModel : ObservableObject
 
             InspectionRegions.Add(new InspectionRegion
             {
-                RegionId = regionName,
+                // Older templates did not persist an ID, so create one when needed.
+                RegionId = string.IsNullOrWhiteSpace(region.Id)
+                    ? Guid.NewGuid().ToString()
+                    : region.Id,
                 RegionName = regionName,
                 XRatio = xRatio,
                 YRatio = yRatio,
