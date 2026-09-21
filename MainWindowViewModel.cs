@@ -73,6 +73,19 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly RoiTemplateStorageService _roiTemplateStorageService;
     private string? _selectedFilePath;
 
+/// <summary>
+/// 대화창을 통하려고 했으나 ubuntu wayland 환경에서 Key down 이벤트가 대화창을 반복적으로 여는 문제 확인하여 대화창을 통하지 않고 MainWindow내의 패널 사용하도록 수정
+/// </summary>
+    [ObservableProperty]
+    private InspectionRegion? _pendingDeleteRegion;
+
+    public bool IsDeleteConfirmationVisible => PendingDeleteRegion is not null;
+
+    partial void OnPendingDeleteRegionChanged(InspectionRegion? value)
+    {
+        OnPropertyChanged(nameof(IsDeleteConfirmationVisible));
+    }
+
     private JsonSerializerOptions _jsonSerializerOptions = new()
     {
         WriteIndented = true,
@@ -161,6 +174,61 @@ public partial class MainWindowViewModel : ObservableObject
 
         /// 그린 ROI 제거
         UpdateCurrentRoiState(0, 0, 0, 0, false);
+    }
+
+    [RelayCommand]
+    private void DeleteSelectedRoi()
+    {
+        RequestDeleteRoi(SelectedInspectionRegion);
+    }
+
+    [RelayCommand]
+    private void DeleteRoi(InspectionRegion? region)
+    {
+        RequestDeleteRoi(region);
+    }
+
+    private void RequestDeleteRoi(InspectionRegion? region)
+    {
+        if (PendingDeleteRegion is not null
+            || region is null
+            || !InspectionRegions.Contains(region))
+        {
+            return;
+        }
+
+        PendingDeleteRegion = region;
+    }
+
+    [RelayCommand]
+    private void ConfirmDeleteRoi()
+    {
+        var region = PendingDeleteRegion;
+        PendingDeleteRegion = null;
+
+        if (region is null)
+        {
+            return;
+        }
+
+        var deletedIndex = InspectionRegions.IndexOf(region);
+        if (deletedIndex < 0)
+        {
+            return;
+        }
+
+        InspectionRegions.RemoveAt(deletedIndex);
+        region.IsSelected = false;
+
+        SelectedInspectionRegion = InspectionRegions.Count == 0
+            ? null
+            : InspectionRegions[Math.Min(deletedIndex, InspectionRegions.Count - 1)];
+    }
+
+    [RelayCommand]
+    private void CancelDeleteRoi()
+    {
+        PendingDeleteRegion = null;
     }
 
     [RelayCommand]

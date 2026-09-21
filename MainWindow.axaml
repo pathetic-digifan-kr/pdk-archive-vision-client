@@ -9,6 +9,7 @@
         d:DesignWidth="1100"
         d:DesignHeight="720"
         x:Class="PdkOcrClient.MainWindow"
+        x:Name="RootWindow"
         x:DataType="local:MainWindowViewModel"
         Title="PDK Archive Vision"
         Width="1100"
@@ -21,6 +22,7 @@
         >
     <Window.KeyBindings>
         <KeyBinding Gesture="Space" Command="{Binding AddRoiCommand}" />
+        <KeyBinding Gesture="Delete" Command="{Binding DeleteSelectedRoiCommand}" />
     </Window.KeyBindings>
 
     <Window.Styles>
@@ -281,7 +283,7 @@
                                         Padding="10"
                                         Margin="0,0,0,8">
                                     <StackPanel Spacing="5">
-                                        <Grid ColumnDefinitions="*, Auto"
+                                        <Grid ColumnDefinitions="*, Auto, Auto"
                                               ColumnSpacing="6">
                                             <TextBlock Grid.Column="0"
                                                        Text="{Binding RegionName}"
@@ -295,6 +297,13 @@
                                                     Content="✎"
                                                     ToolTip.Tip="ROI 이름 수정"
                                                     Command="{Binding StartEditingNameCommand}"
+                                                    IsVisible="{Binding IsEditingName, Converter={x:Static BoolConverters.Not}}" />
+                                            <Button Grid.Column="2"
+                                                    Classes="icon"
+                                                    Content="✕"
+                                                    ToolTip.Tip="ROI 삭제"
+                                                    Command="{Binding #RootWindow.DataContext.DeleteRoiCommand}"
+                                                    CommandParameter="{Binding}"
                                                     IsVisible="{Binding IsEditingName, Converter={x:Static BoolConverters.Not}}" />
                                             <TextBox Grid.Column="0"
                                                      Name="RoiNameEditor"
@@ -357,6 +366,49 @@
                         Content="OCR 분석 시작"
                         Command="{Binding DoOcrCommand}" />
             </Grid>
+        </Border>
+
+        <Border Grid.RowSpan="4"
+                ZIndex="100"
+                Background="#66000000"
+                IsVisible="{Binding IsDeleteConfirmationVisible}">
+            <Border Width="420"
+                    Padding="24"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="White"
+                    BorderBrush="#CBD5E1"
+                    BorderThickness="1"
+                    CornerRadius="10">
+                <Grid RowDefinitions="Auto, Auto, Auto"
+                      RowSpacing="18">
+                    <TextBlock Text="ROI 삭제"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="#111827" />
+                    <TextBlock Grid.Row="1"
+                               TextWrapping="Wrap"
+                               Foreground="#374151"
+                               FontSize="15">
+                        <Run Text="'" />
+                        <Run Text="{Binding PendingDeleteRegion?.RegionName,
+                                            TargetNullValue='',
+                                            FallbackValue=''}" />
+                        <Run Text="' ROI를 삭제하시겠습니까?" />
+                    </TextBlock>
+                    <StackPanel Grid.Row="2"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Spacing="10">
+                        <Button Content="삭제"
+                                Classes="primary"
+                                Command="{Binding ConfirmDeleteRoiCommand}" />
+                        <Button Content="취소"
+                                Classes="secondary"
+                                Command="{Binding CancelDeleteRoiCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Border>
     </Grid>
 </Window>
