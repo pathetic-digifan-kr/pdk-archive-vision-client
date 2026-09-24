@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
@@ -72,6 +73,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly OcrClient _ocrClient;
     private readonly RoiTemplateStorageService _roiTemplateStorageService;
     private string? _selectedFilePath;
+    private TemplateReference? _activeTemplate;
 
 /// <summary>
 /// 대화창을 통하려고 했으나 ubuntu wayland 환경에서 Key down 이벤트가 대화창을 반복적으로 여는 문제 확인하여 대화창을 통하지 않고 MainWindow내의 패널 사용하도록 수정
@@ -89,6 +91,8 @@ public partial class MainWindowViewModel : ObservableObject
     private JsonSerializerOptions _jsonSerializerOptions = new()
     {
         WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
     };
 
@@ -257,6 +261,7 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 Id = region.RegionId,
                 Label = region.RegionName,
+                FieldKey = region.FieldKey,
                 X = region.XRatio,
                 Y = region.YRatio,
                 Width = region.WidthRatio,
@@ -265,6 +270,11 @@ public partial class MainWindowViewModel : ObservableObject
         };
 
         await _roiTemplateStorageService.SaveTemplateAsync(template, _selectedFilePath);
+        _activeTemplate = new TemplateReference
+        {
+            Id = template.Id,
+            Name = template.Name
+        };
         Debug.WriteLine($"Saved ROI template: {templateName}");
     }
 
@@ -309,6 +319,7 @@ public partial class MainWindowViewModel : ObservableObject
                     ? Guid.NewGuid().ToString()
                     : region.Id,
                 RegionName = regionName,
+                FieldKey = region.FieldKey,
                 XRatio = xRatio,
                 YRatio = yRatio,
                 WidthRatio = widthRatio,
@@ -319,6 +330,12 @@ public partial class MainWindowViewModel : ObservableObject
                 Height = heightRatio * MainImage.PixelSize.Height
             });
         }
+
+        _activeTemplate = new TemplateReference
+        {
+            Id = template.Id,
+            Name = template.Name
+        };
 
         UpdateCurrentRoiState(0, 0, 0, 0, false);
         Debug.WriteLine($"Loaded ROI template: {template.Name}");
@@ -333,13 +350,17 @@ public partial class MainWindowViewModel : ObservableObject
             .Select(region => new ImageDirectoryInspectionRoiOption(
                 region.RegionId,
                 region.RegionName,
+                region.FieldKey,
                 region.XRatio,
                 region.YRatio,
                 region.WidthRatio,
                 region.HeightRatio))
             .ToList();
 
-        await _dialogService.OpenImageDirectoryInspectionDialogAsync(roiOptions, _ocrClient);
+        await _dialogService.OpenImageDirectoryInspectionDialogAsync(
+            roiOptions,
+            _ocrClient,
+            _activeTemplate);
     }
 
     [RelayCommand]
@@ -373,15 +394,33 @@ public partial class MainWindowViewModel : ObservableObject
 
             var response = await _ocrClient.SendOcrRequestAsync(webpStream, roiModels);
 
-            foreach(var inspectionRegion in InspectionRegions)
+            foreach (var inspectionRegion in InspectionRegions)
             {
-                inspectionRegion.OcrResult = response?.parsed_data?.Where(x => x.Id == inspectionRegion.RegionId)?.First()?.Text ?? "OCR 누락";
+                var result = response?.parsed_data?
+                    .FirstOrDefault(x => x.Id == inspectionRegion.RegionId);
+
+                inspectionRegion.OcrErrorMessage = null;
+                inspectionRegion.OcrConfidence = result?.Confidence;
+                inspectionRegion.OcrResult = result?.Text?.Trim() ?? string.Empty;
+                inspectionRegion.OcrStatus = result is null
+                    ? "missing"
+                    : string.IsNullOrWhiteSpace(inspectionRegion.OcrResult)
+                        ? "empty"
+                        : "recognized";
             }
 
             Debug.WriteLine($"OCR 응답: {response}");
         }
         catch (Exception ex)
         {
+            foreach (var inspectionRegion in InspectionRegions)
+            {
+                inspectionRegion.OcrResult = string.Empty;
+                inspectionRegion.OcrConfidence = null;
+                inspectionRegion.OcrStatus = "error";
+                inspectionRegion.OcrErrorMessage = ex.Message;
+            }
+
             Debug.WriteLine($"OCR 실행 실패: {ex.Message}");
         }
     }
@@ -389,6 +428,12 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private async Task SaveOcrResult()
     {
+        if (MainImage is null || string.IsNullOrWhiteSpace(_selectedFilePath))
+        {
+            Debug.WriteLine("OCR 결과 저장 실패: 이미지가 로드되지 않았습니다.");
+            return;
+        }
+
         if (InspectionRegions.Count == 0)
         {
             Debug.WriteLine("OCR 결과 저장 실패: ROI가 없습니다.");
@@ -407,15 +452,36 @@ public partial class MainWindowViewModel : ObservableObject
 
         try
         {
-            // 중복 방지로 groupBy를 사용하여 마지막 OCR 결과만 저장
-            var ocrResults = InspectionRegions
-            .GroupBy(region => region.RegionName)
-            .ToDictionary(
-                group => group.Key,
-                group => group.Last().OcrResult);
+            var resultDocument = new OcrResultDocument
+            {
+                SourceImage = new SourceImageReference
+                {
+                    Path = _selectedFilePath,
+                    FileName = SelectedFileName
+                },
+                Template = _activeTemplate,
+                Regions = [.. InspectionRegions.Select(region => new OcrResultRegion
+                {
+                    RegionId = region.RegionId,
+                    Label = region.RegionName,
+                    FieldKey = region.FieldKey,
+                    X = region.XRatio,
+                    Y = region.YRatio,
+                    Width = region.WidthRatio,
+                    Height = region.HeightRatio
+                })],
+                Results = [.. InspectionRegions.Select(region => new OcrResultRecord
+                {
+                    RegionId = region.RegionId,
+                    Text = region.OcrResult,
+                    Confidence = region.OcrConfidence,
+                    Status = region.OcrStatus,
+                    ErrorMessage = region.OcrErrorMessage
+                })]
+            };
 
             await using var stream = File.Create(filePath);
-            await JsonSerializer.SerializeAsync(stream, ocrResults, _jsonSerializerOptions);
+            await JsonSerializer.SerializeAsync(stream, resultDocument, _jsonSerializerOptions);
 
             Debug.WriteLine($"OCR 결과 저장 완료: {filePath}");
         }
@@ -433,6 +499,7 @@ public partial class MainWindowViewModel : ObservableObject
         MainImage = new Bitmap(stream);
         SelectedFileName = Path.GetFileName(filePath);
         _selectedFilePath = filePath;
+        _activeTemplate = null;
         CurrentRoiCanvasWidth = MainImage.PixelSize.Width;
         CurrentRoiCanvasHeight = MainImage.PixelSize.Height;
         UpdateRoiPixelsFromRatios();

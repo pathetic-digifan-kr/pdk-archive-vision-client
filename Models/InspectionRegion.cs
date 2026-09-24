@@ -35,7 +35,19 @@ public partial class InspectionRegion : ObservableObject
     private string _regionName = string.Empty;
 
     [ObservableProperty]
+    private string? _fieldKey;
+
+    [ObservableProperty]
     private string _ocrResult = string.Empty;
+
+    [ObservableProperty]
+    private double? _ocrConfidence;
+
+    [ObservableProperty]
+    private string _ocrStatus = "missing";
+
+    [ObservableProperty]
+    private string? _ocrErrorMessage;
 
     [RelayCommand]
     private void StartEditingName()

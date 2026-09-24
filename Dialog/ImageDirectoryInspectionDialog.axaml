@@ -178,6 +178,9 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Spacing="10">
+            <Button Content="결과 저장"
+                    Padding="16,8"
+                    Command="{Binding SaveResultsCommand}" />
             <Button Content="닫기"
                     IsCancel="True"
                     Padding="16,8"

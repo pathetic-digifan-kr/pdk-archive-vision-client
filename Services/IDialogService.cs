@@ -17,5 +17,6 @@ public interface IDialogService
 
     Task OpenImageDirectoryInspectionDialogAsync(
         IReadOnlyList<ImageDirectoryInspectionRoiOption> roiOptions,
-        OcrClient ocrClient);
+        OcrClient ocrClient,
+        TemplateReference? template = null);
 }

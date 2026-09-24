@@ -133,7 +133,8 @@ public class WindowDialogService : IDialogService
 
     public async Task OpenImageDirectoryInspectionDialogAsync(
         IReadOnlyList<ImageDirectoryInspectionRoiOption> roiOptions,
-        OcrClient ocrClient)
+        OcrClient ocrClient,
+        TemplateReference? template = null)
     {
         if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop
             || desktop.MainWindow is not Window mainWindow)
@@ -150,7 +151,9 @@ public class WindowDialogService : IDialogService
             roiOptions,
             ocrClient,
             () => SelectDirectoryAsync(mainWindow, "검사할 이미지 디렉토리 선택"),
-            () => dialog.Close());
+            () => SaveFileDialogAsync("배치 OCR 결과 저장", "ocr-batch-results.json"),
+            () => dialog.Close(),
+            template);
 
         dialog.DataContext = viewModel;
         await dialog.ShowDialog(mainWindow);

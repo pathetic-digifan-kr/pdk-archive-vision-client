@@ -5,6 +5,7 @@ namespace PdkOcrClient.Services;
 public sealed record ImageDirectoryInspectionRoiOption(
     string Id,
     string Name,
+    string? FieldKey,
     double X,
     double Y,
     double Width,

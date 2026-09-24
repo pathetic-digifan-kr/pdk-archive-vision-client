@@ -10,6 +10,7 @@ public class RoiTemplateRegion
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Label { get; set; } = string.Empty;
+    public string? FieldKey { get; set; }
     public double X { get; set; }
     public double Y { get; set; }
     public double Width { get; set; }
